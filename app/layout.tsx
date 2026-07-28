@@ -7,7 +7,7 @@ export async function generateMetadata(): Promise<Metadata> {
   const host = requestHeaders.get("x-forwarded-host") ?? requestHeaders.get("host") ?? "localhost:3000";
   const protocol = requestHeaders.get("x-forwarded-proto") ?? (host.startsWith("localhost") ? "http" : "https");
   const origin = `${protocol}://${host}`;
-  const title = "在地可持续行动地图";
+  const title = "一循地方 · YIXUN PLACE";
   const description = "探索真实地点，共同学习可持续发展，并把知识变成发生在身边的行动。";
 
   return {

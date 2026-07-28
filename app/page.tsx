@@ -129,8 +129,8 @@ export default function Home() {
             <b />
           </span>
           <span>
-            <strong>在地可持续行动地图</strong>
-            <small>LOCAL ACTION MAP</small>
+            <strong>一循地方</strong>
+            <small>YIXUN PLACE</small>
           </span>
         </a>
 
@@ -450,18 +450,18 @@ export default function Home() {
           <div className="footer-brand">
             <a className="brand" href="#top">
               <span className="brand-mark inverse" aria-hidden="true"><i /><b /></span>
-              <span><strong>在地可持续行动地图</strong><small>LOCAL ACTION MAP</small></span>
+              <span><strong>一循地方</strong><small>YIXUN PLACE</small></span>
             </a>
             <p>探索地方 · 共同学习 · 采取行动</p>
           </div>
           <div className="footer-links">
             <div><strong>参与</strong><a href="#places">探索地点</a><a href="#workshops">工作坊</a><a href="#learning">线上微课</a></div>
             <div><strong>关于</strong><a href="#impact">项目成果</a><button onClick={() => setToast("合作咨询入口将在下一版本开放")}>机构合作</button><button onClick={() => setToast("志愿者招募即将开放")}>成为志愿者</button></div>
-            <div><strong>联系</strong><span>hello@localaction.map</span><span>上海 · 中国</span></div>
+            <div><strong>联系</strong><span>hello@yixun.place</span><span>上海 · 中国</span></div>
           </div>
         </div>
         <div className="footer-bottom section-shell">
-          <span>© 2026 Local Action Map</span>
+          <span>© 2026 YIXUN PLACE</span>
           <span>为更可持续的地方共同学习</span>
         </div>
       </footer>
