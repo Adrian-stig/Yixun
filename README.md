@@ -1,98 +1,98 @@
-# vinext-starter
+# 一循地方 · YIXUN PLACE
 
-A clean full-stack starter running on
-[vinext](https://github.com/cloudflare/vinext), with optional Cloudflare D1 and
-Drizzle support.
+面向公众、学生、教师、志愿者和公益组织的可持续发展学习与行动平台。
 
-## Prerequisites
+网站将真实地点探索、线下工作坊、线上微课、公众行动、观察记录与项目成果连接起来。当前版本是一个使用模拟数据的响应式 Web MVP。
+
+## 在 VS Code 中打开
+
+环境要求：
 
 - Node.js `>=22.13.0`
+- npm（随 Node.js 安装）
+- Visual Studio Code
 
-## Quick Start
+打开终端并运行：
 
 ```bash
+cd local-action-map
+code .
 npm install
 npm run dev
-npm run build
 ```
 
-This starter does not use `wrangler.jsonc`.
+开发服务器启动后，在浏览器访问终端显示的本地地址，通常为：
 
-## Included Shape
-
-- edit site code under `app/`
-- `.openai/hosting.json` declares optional Sites D1 and R2 bindings
-- `vite.config.ts` simulates declared bindings for local development
-- `db/schema.ts` starts intentionally empty
-- `examples/d1/` contains an optional D1 example surface
-- `drizzle.config.ts` supports local migration generation when needed
-
-## Workspace Auth Headers
-
-OpenAI workspace sites can read the current user's email from
-`oai-authenticated-user-email`.
-
-SIWC-authenticated workspace sites may also receive
-`oai-authenticated-user-full-name` when the user's SIWC profile has a non-empty
-`name` claim. The full-name value is percent-encoded UTF-8 and is accompanied by
-`oai-authenticated-user-full-name-encoding: percent-encoded-utf-8`.
-
-Treat the full name as optional and fall back to email when it is absent:
-
-```tsx
-import { headers } from "next/headers";
-
-export default async function Home() {
-  const requestHeaders = await headers();
-  const email = requestHeaders.get("oai-authenticated-user-email");
-  const encodedFullName = requestHeaders.get("oai-authenticated-user-full-name");
-  const fullName =
-    encodedFullName &&
-    requestHeaders.get("oai-authenticated-user-full-name-encoding") ===
-      "percent-encoded-utf-8"
-      ? decodeURIComponent(encodedFullName)
-      : null;
-
-  const displayName = fullName ?? email;
-  // ...
-}
+```text
+http://localhost:3000
 ```
 
-## Optional Dispatch-Owned ChatGPT Sign-In
+保存代码后页面会自动刷新。
 
-Import the ready-to-use helpers from `app/chatgpt-auth.ts` when the site needs
-optional or required ChatGPT sign-in:
+## 常用命令
 
-- Use `getChatGPTUser()` for optional signed-in UI.
-- Use `requireChatGPTUser(returnTo)` for server-rendered pages that should send
-  anonymous visitors through Sign in with ChatGPT.
-- Use `chatGPTSignInPath(returnTo)` and `chatGPTSignOutPath(returnTo)` for
-  browser links or actions.
-- Pass a same-origin relative `returnTo` path for the destination after sign-in
-  or sign-out. The helper validates and safely encodes it.
-- Mark protected pages with `export const dynamic = "force-dynamic"` because
-  they depend on per-request identity headers.
+```bash
+npm run dev       # 启动本地开发环境
+npm run build     # 检查生产构建
+npm test          # 构建并运行基础页面测试
+npm run lint      # 运行代码规范检查
+```
 
-Dispatch owns `/signin-with-chatgpt`, `/signout-with-chatgpt`, `/callback`, the
-OAuth cookies, and identity header injection. Do not implement app routes for
-those reserved paths. Routes that do not import and call the helper remain
-anonymous-compatible.
+## 主要文件
 
-SIWC establishes identity only; it does not prove workspace membership. Use the
-Sites hosting platform's access policy controls for workspace-wide restrictions,
-or enforce explicit server-side membership or allowlist checks.
+```text
+local-action-map/
+├── app/
+│   ├── page.tsx          # 首页内容、模拟数据与交互逻辑
+│   ├── globals.css       # 全站视觉样式和响应式布局
+│   ├── layout.tsx        # 页面标题、分享信息和全局布局
+│   └── chatgpt-auth.ts   # 可选的 ChatGPT 登录辅助方法
+├── public/
+│   ├── og.png            # 社交平台分享封面
+│   └── favicon.png       # 网站图标
+├── db/                   # 未来接入数据库时使用
+├── worker/               # Cloudflare Worker 入口
+├── tests/                # 基础页面测试
+├── package.json          # 项目依赖和命令
+└── vite.config.ts        # 本地开发和构建配置
+```
 
-Use SIWC for account pages, user-specific dashboards, saved records, and write
-actions tied to the current ChatGPT user. Leave public content anonymous.
+## 从哪里开始修改
 
-## Useful Commands
+- 修改首页文字、地点、工作坊和评价体系：`app/page.tsx`
+- 修改颜色、字体、间距和移动端布局：`app/globals.css`
+- 修改网页标题、搜索摘要和分享信息：`app/layout.tsx`
+- 替换分享封面或图标：`public/`
 
-- `npm run dev`: start local development
-- `npm run build`: verify the vinext build output
-- `npm test`: build the starter and verify its rendered loading skeleton
-- `npm run db:generate`: generate Drizzle migrations after schema changes
+## 当前实现范围
 
-## Learn More
+已经实现：
 
-- [vinext Documentation](https://github.com/cloudflare/vinext)
-- [Drizzle D1 Guide](https://orm.drizzle.team/docs/get-started/d1-new)
+- 项目背景、目标与四维评价体系
+- 地点地图和列表切换
+- 议题筛选与地点详情
+- 工作坊展示和模拟报名
+- 微课加入和行动进度演示
+- 项目成果与影响力展示
+- 桌面端和移动端响应式布局
+
+仍为演示或预留：
+
+- 地点、活动和用户数据目前写在前端代码中
+- 报名表不会向真实后端提交
+- 个人进度只保存在当前页面状态中
+- 中英文切换入口已预留，尚未完成全量翻译
+- 文件上传、账号体系和管理后台尚未接入
+
+## 技术结构
+
+- React 19
+- TypeScript
+- Next.js 兼容接口
+- vinext + Vite
+- Tailwind CSS 基础环境与定制 CSS
+- Cloudflare Workers 兼容构建
+
+线上预览：
+
+<https://local-action-map-cn.adrian750826.chatgpt.site>
