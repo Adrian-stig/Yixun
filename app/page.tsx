@@ -73,6 +73,41 @@ const steps = [
   ["04", "看见影响", "把个人行动汇入公开、可追踪的项目成果。"],
 ];
 
+const frameworkDimensions = [
+  {
+    id: "management",
+    number: "01",
+    title: "可持续的管理模式",
+    english: "Sustainable Management",
+    description: "关注地方是否具备清晰的长期愿景、协作机制与资源配置能力，让可持续行动能够被组织、延续和迭代。",
+    focus: ["长期战略", "多方治理", "资源协同"],
+  },
+  {
+    id: "nature",
+    number: "02",
+    title: "生态自然保护",
+    english: "Environmental Protection",
+    description: "从生态系统与自然资源出发，观察生物多样性、环境压力、保护行动与生态韧性之间的关系。",
+    focus: ["生态保护", "资源利用", "环境韧性"],
+  },
+  {
+    id: "culture",
+    number: "03",
+    title: "文化保护",
+    english: "Cultural Protection",
+    description: "理解地方知识、文化记忆与社区认同如何被尊重、传承，并在发展过程中持续发挥价值。",
+    focus: ["地方知识", "文化传承", "社区认同"],
+  },
+  {
+    id: "value",
+    number: "04",
+    title: "创造社会和经济价值",
+    english: "Socio-economic Value",
+    description: "关注发展成果能否改善在地生计、促进社会包容与创新，并在参与者之间形成负责任的价值共享。",
+    focus: ["在地生计", "社会创新", "价值共享"],
+  },
+];
+
 const stories = [
   { value: "1,286", label: "次公众观察", note: "覆盖 24 个真实地点" },
   { value: "4,920", label: "小时共同行动", note: "由学习者与志愿者完成" },
@@ -88,8 +123,11 @@ export default function Home() {
   const [signupOpen, setSignupOpen] = useState(false);
   const [joined, setJoined] = useState(false);
   const [toast, setToast] = useState("");
+  const [activeDimension, setActiveDimension] = useState(frameworkDimensions[0].id);
 
   const currentPlace = places.find((place) => place.id === activePlace) ?? places[0];
+  const currentDimension =
+    frameworkDimensions.find((dimension) => dimension.id === activeDimension) ?? frameworkDimensions[0];
   const topics = ["全部议题", ...new Set(places.map((place) => place.topic))];
   const filteredPlaces = useMemo(
     () => (topic === "全部议题" ? places : places.filter((place) => place.topic === topic)),
@@ -135,6 +173,7 @@ export default function Home() {
         </a>
 
         <nav className={mobileOpen ? "nav-links open" : "nav-links"} aria-label="主要导航">
+          <button onClick={() => scrollTo("about")}>项目介绍</button>
           <button onClick={() => scrollTo("places")}>探索地点</button>
           <button onClick={() => scrollTo("workshops")}>工作坊</button>
           <button onClick={() => scrollTo("learning")}>微课学习</button>
@@ -182,8 +221,8 @@ export default function Home() {
             <button className="primary-button" onClick={() => scrollTo("places")}>
               开始探索 <span>↓</span>
             </button>
-            <button className="text-button" onClick={() => scrollTo("learning")}>
-              了解如何参与 <span>↗</span>
+            <button className="text-button" onClick={() => scrollTo("about")}>
+              了解一循地方 <span>↗</span>
             </button>
           </div>
           <div className="hero-proof">
@@ -228,6 +267,165 @@ export default function Home() {
       <section className="ticker" aria-label="平台特点">
         <span>真实地点</span><i>✦</i><span>共同学习</span><i>✦</i>
         <span>公众行动</span><i>✦</i><span>开放成果</span><i>✦</i><span>真实地点</span>
+      </section>
+
+      <section className="about-section" id="about">
+        <div className="section-shell">
+          <div className="section-heading about-heading">
+            <div>
+              <span className="eyebrow"><i /> ABOUT YIXUN PLACE</span>
+              <h2>从地方获得启发，<br />共同创造可持续的未来。</h2>
+            </div>
+            <p>
+              一循地方把真实场景、系统性评价与多元共创连接起来，
+              帮助每一个地方看见自身的优势、挑战与下一步行动。
+            </p>
+          </div>
+
+          <article className="background-story">
+            <div className="story-index">
+              <span>01</span>
+              <strong>项目背景</strong>
+              <small>WHY PLACE MATTERS</small>
+            </div>
+            <div className="story-copy">
+              <p className="story-lead">
+                气候变化、能源危机与塑料污染正在加剧资源短缺和环境压力。
+                面对全球性挑战，我们选择回到具体的地方，寻找另一种发展路径。
+              </p>
+              <div className="story-columns">
+                <p>
+                  我们把地方理解为一个不断生长的生命体：它拥有独特的自然禀赋，
+                  也承载着文化、人文、经济与社区关系。真正的可持续发展，
+                  需要从这些在地特征出发，同时回应生态危机和城市化带来的脆弱性。
+                </p>
+                <p>
+                  自 2020 年起，一循地方走进森林、海岛、有机茶园、自然保护区与古村落，
+                  通过场景式学习和多方对话，与在地伙伴共同理解问题、发现潜力，
+                  探索因地制宜的可持续发展战略。
+                </p>
+              </div>
+            </div>
+          </article>
+
+          <div className="history-strip" aria-label="项目发展数据">
+            <div><strong>2009</strong><span>商业生态团队开始持续深耕<br />可持续发展议题</span></div>
+            <div><strong>130+</strong><span>截至 2023 年底举办<br />商业生态学习坊</span></div>
+            <div><strong>4,000+</strong><span>学习坊累计培养与连接的<br />参与人次</span></div>
+            <div><strong>14 / 209</strong><span>截至 2026 年 4 月，一循地方工作坊<br />场次 / 多元相关方参与人次</span></div>
+          </div>
+
+          <article className="goal-panel">
+            <div className="story-index light-index">
+              <span>02</span>
+              <strong>项目目标</strong>
+              <small>WHAT WE AIM FOR</small>
+            </div>
+            <div className="goal-content">
+              <blockquote>
+                与地方建立长期而深入的连接，陪伴在地伙伴共创一条
+                <em>因地制宜、可持续、可行动</em>的发展路径。
+              </blockquote>
+              <div className="goal-grid">
+                <div>
+                  <span>连接地方</span>
+                  <h3>看见真实处境</h3>
+                  <p>从自然与人的生态智慧中获得启发，理解地方的优势、挑战与长期需要。</p>
+                </div>
+                <div>
+                  <span>赋能行动</span>
+                  <h3>把共识变成方案</h3>
+                  <p>以领导力工作坊、在地培训和项目孵化，形成战略规划与可执行的行动方案。</p>
+                </div>
+                <div>
+                  <span>共建韧性</span>
+                  <h3>协同多元责任方</h3>
+                  <p>共同保护和恢复生态、文化与社会经济环境，提升自然与社区的韧性。</p>
+                </div>
+                <div>
+                  <span>形成社群</span>
+                  <h3>培育“一循文化”</h3>
+                  <p>以真实关系、共同价值与伙伴连接，支持个人成长并建立持续行动力。</p>
+                </div>
+              </div>
+            </div>
+          </article>
+
+          <article className="framework-section">
+            <div className="framework-intro">
+              <div className="story-index">
+                <span>03</span>
+                <strong>评价体系</strong>
+                <small>HOW WE EVALUATE</small>
+              </div>
+              <div>
+                <h3>“一循地方探索家”系统性框架</h3>
+                <p>
+                  基于多年项目实践与国内外研究，我们以 4 个维度、29 项标准开展探索和调研。
+                  它不是一张静态的打分表，而是一套帮助参与者理解地方、建立连接并共同制定未来策略的方法。
+                </p>
+                <div className="framework-badges">
+                  <span><strong>4</strong> 个评价维度</span>
+                  <span><strong>29</strong> 项观察标准</span>
+                  <span><strong>1</strong> 套共创方法</span>
+                </div>
+              </div>
+            </div>
+
+            <div className="framework-explorer">
+              <div className="dimension-grid" role="group" aria-label="评价维度">
+                {frameworkDimensions.map((dimension) => (
+                  <button
+                    key={dimension.id}
+                    className={activeDimension === dimension.id ? "active" : ""}
+                    onClick={() => setActiveDimension(dimension.id)}
+                    aria-pressed={activeDimension === dimension.id}
+                  >
+                    <span>{dimension.number}</span>
+                    <strong>{dimension.title}</strong>
+                    <small>{dimension.english}</small>
+                  </button>
+                ))}
+              </div>
+              <div className="dimension-detail" aria-live="polite">
+                <span className="dimension-number">{currentDimension.number}</span>
+                <small>{currentDimension.english}</small>
+                <h3>{currentDimension.title}</h3>
+                <p>{currentDimension.description}</p>
+                <div>
+                  {currentDimension.focus.map((item) => <span key={item}>{item}</span>)}
+                </div>
+              </div>
+            </div>
+
+            <div className="method-flow">
+              <div className="method-heading">
+                <span>CO-CREATION METHOD</span>
+                <strong>从体验到行动的共创机制</strong>
+              </div>
+              {[
+                ["01", "场景式体验与学习", "走进地方，在真实环境中观察、感受与提问。"],
+                ["02", "多元责任方参与", "连接当地居民、实践者、机构与外部参与者。"],
+                ["03", "对话启发与共创", "围绕现状、机会和挑战展开深度讨论。"],
+                ["04", "评价与行动建议", "运用 29 项标准识别优势，形成策略与行动方案。"],
+              ].map(([number, title, description]) => (
+                <div className="method-step" key={number}>
+                  <span>{number}</span>
+                  <h4>{title}</h4>
+                  <p>{description}</p>
+                </div>
+              ))}
+            </div>
+
+            <div className="framework-outcome">
+              <span>评价输出</span>
+              <strong>识别优势</strong><i>→</i>
+              <strong>发现挑战</strong><i>→</i>
+              <strong>形成建议</strong><i>→</i>
+              <strong>制定战略与行动方案</strong>
+            </div>
+          </article>
+        </div>
       </section>
 
       <section className="places-section section-shell" id="places">
@@ -456,7 +654,7 @@ export default function Home() {
           </div>
           <div className="footer-links">
             <div><strong>参与</strong><a href="#places">探索地点</a><a href="#workshops">工作坊</a><a href="#learning">线上微课</a></div>
-            <div><strong>关于</strong><a href="#impact">项目成果</a><button onClick={() => setToast("合作咨询入口将在下一版本开放")}>机构合作</button><button onClick={() => setToast("志愿者招募即将开放")}>成为志愿者</button></div>
+            <div><strong>关于</strong><a href="#about">项目介绍</a><a href="#impact">项目成果</a><button onClick={() => setToast("合作咨询入口将在下一版本开放")}>机构合作</button></div>
             <div><strong>联系</strong><span>hello@yixun.place</span><span>上海 · 中国</span></div>
           </div>
         </div>

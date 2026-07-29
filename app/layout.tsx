@@ -8,7 +8,7 @@ export async function generateMetadata(): Promise<Metadata> {
   const protocol = requestHeaders.get("x-forwarded-proto") ?? (host.startsWith("localhost") ? "http" : "https");
   const origin = `${protocol}://${host}`;
   const title = "一循地方 · YIXUN PLACE";
-  const description = "探索真实地点，共同学习可持续发展，并把知识变成发生在身边的行动。";
+  const description = "了解一循地方的项目背景、共创目标与四维评价体系，探索真实地点，共同学习并把可持续知识转化为行动。";
 
   return {
     metadataBase: new URL(origin),
