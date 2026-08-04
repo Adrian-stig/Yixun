@@ -15,34 +15,6 @@ type Place = {
   description: string;
 };
 
-type CarbonAnswers = {
-  householdSize: number;
-  electricityMonthly: number;
-  gasMonthly: number;
-  carKmWeekly: number;
-  transitKmWeekly: number;
-  shortFlightsYearly: number;
-  longFlightsYearly: number;
-  meatMealsWeekly: number;
-  foodWaste: "low" | "medium" | "high";
-  shopping: "low" | "moderate" | "high";
-};
-
-const defaultCarbonAnswers: CarbonAnswers = {
-  householdSize: 2,
-  electricityMonthly: 180,
-  gasMonthly: 12,
-  carKmWeekly: 40,
-  transitKmWeekly: 80,
-  shortFlightsYearly: 1,
-  longFlightsYearly: 0,
-  meatMealsWeekly: 5,
-  foodWaste: "low",
-  shopping: "moderate",
-};
-
-const carbonSteps = ["居住与能源", "日常出行", "饮食与消费", "估算结果"];
-
 const places: Place[] = [
   {
     id: 1,
@@ -142,6 +114,24 @@ const stories = [
   { value: "78%", label: "行动任务完成率", note: "工作坊结束后 30 天内" },
 ];
 
+function PhotoSlot({
+  label,
+  note,
+  className = "",
+}: {
+  label: string;
+  note: string;
+  className?: string;
+}) {
+  return (
+    <div className={`photo-slot ${className}`} role="img" aria-label={`${label}照片占位`}>
+      <span><i>＋</i> PHOTO PLACEHOLDER</span>
+      <strong>{label}</strong>
+      <small>{note}</small>
+    </div>
+  );
+}
+
 export default function Home() {
   const [activePlace, setActivePlace] = useState(places[0].id);
   const [topic, setTopic] = useState("全部议题");
@@ -152,9 +142,6 @@ export default function Home() {
   const [joined, setJoined] = useState(false);
   const [toast, setToast] = useState("");
   const [activeDimension, setActiveDimension] = useState(frameworkDimensions[0].id);
-  const [carbonStep, setCarbonStep] = useState(0);
-  const [carbonAnswers, setCarbonAnswers] = useState<CarbonAnswers>(defaultCarbonAnswers);
-
   const currentPlace = places.find((place) => place.id === activePlace) ?? places[0];
   const currentDimension =
     frameworkDimensions.find((dimension) => dimension.id === activeDimension) ?? frameworkDimensions[0];
@@ -163,55 +150,6 @@ export default function Home() {
     () => (topic === "全部议题" ? places : places.filter((place) => place.topic === topic)),
     [topic],
   );
-  const carbonResult = useMemo(() => {
-    const household = Math.max(1, carbonAnswers.householdSize);
-    const energy =
-      (carbonAnswers.electricityMonthly * 12 * 0.57 + carbonAnswers.gasMonthly * 12 * 2.16) /
-      household /
-      1000;
-    const transport =
-      (carbonAnswers.carKmWeekly * 52 * 0.18 +
-        carbonAnswers.transitKmWeekly * 52 * 0.045 +
-        carbonAnswers.shortFlightsYearly * 250 +
-        carbonAnswers.longFlightsYearly * 1100) /
-      1000;
-    const wasteFactor = { low: 0.08, medium: 0.22, high: 0.45 }[carbonAnswers.foodWaste];
-    const shoppingFactor = { low: 0.35, moderate: 0.75, high: 1.4 }[carbonAnswers.shopping];
-    const lifestyle = 0.65 + carbonAnswers.meatMealsWeekly * 0.078 + wasteFactor + shoppingFactor;
-    const total = energy + transport + lifestyle;
-    const categories = [
-      { key: "energy", label: "居住与能源", value: energy, color: "#f2b84b" },
-      { key: "transport", label: "日常出行", value: transport, color: "#ee6d3f" },
-      { key: "lifestyle", label: "饮食与消费", value: lifestyle, color: "#78915b" },
-    ];
-    const largest = [...categories].sort((a, b) => b.value - a.value)[0];
-    return { total, categories, largest };
-  }, [carbonAnswers]);
-
-  const carbonSuggestions = useMemo(() => {
-    const suggestions: string[][] = [];
-    if (carbonAnswers.longFlightsYearly + carbonAnswers.shortFlightsYearly > 0) {
-      suggestions.push(["先看飞行", "尝试用一次铁路、视频会议或更长停留替代往返飞行。"]);
-    } else if (carbonAnswers.carKmWeekly > 0) {
-      suggestions.push(["调整一段通勤", "每周选择一天步行、骑行、公共交通或拼车。"]);
-    } else {
-      suggestions.push(["保持低碳出行", "继续优先选择步行、骑行和公共交通。"]);
-    }
-    if (carbonAnswers.meatMealsWeekly >= 5) {
-      suggestions.push(["从两餐开始", "每周把两顿肉类餐替换为本地、当季的植物性餐食。"]);
-    } else {
-      suggestions.push(["减少食物浪费", "按需购买、妥善储存，并记录一周内被丢弃的食物。"]);
-    }
-    if (carbonAnswers.electricityMonthly >= 180) {
-      suggestions.push(["给家庭用电减 10%", "从空调设定、待机电器与照明使用中寻找最容易的一项。"]);
-    } else if (carbonAnswers.shopping !== "low") {
-      suggestions.push(["延长物品寿命", "购买前先考虑维修、租借、二手或延迟 30 天再决定。"]);
-    } else {
-      suggestions.push(["记录你的好选择", "连续七天记下低碳选择，找到最容易长期保持的一项。"]);
-    }
-    return suggestions.slice(0, 3);
-  }, [carbonAnswers]);
-
   useEffect(() => {
     if (!toast) return;
     const timeout = window.setTimeout(() => setToast(""), 2600);
@@ -246,7 +184,6 @@ export default function Home() {
 
         <nav className={mobileOpen ? "nav-links open" : "nav-links"} aria-label="主要导航">
           <button onClick={() => scrollTo("about")}>项目介绍</button>
-          <button onClick={() => scrollTo("carbon")}>碳足迹</button>
           <button onClick={() => scrollTo("places")}>探索地点</button>
           <button onClick={() => scrollTo("workshops")}>工作坊</button>
           <button onClick={() => scrollTo("learning")}>微课学习</button>
@@ -378,6 +315,10 @@ export default function Home() {
                   探索因地制宜的可持续发展战略。
                 </p>
               </div>
+              <div className="about-photo-row">
+                <PhotoSlot label="地方环境与自然景观" note="建议使用横版照片 · 3:2" className="wide-slot" />
+                <PhotoSlot label="伙伴走访与在地交流" note="建议使用横版照片 · 3:2" />
+              </div>
             </div>
           </article>
 
@@ -421,6 +362,7 @@ export default function Home() {
                   <p>以真实关系、共同价值与伙伴连接，支持个人成长并建立持续行动力。</p>
                 </div>
               </div>
+              <PhotoSlot label="工作坊共创现场" note="建议使用多人参与的纪实照片 · 16:7" className="goal-photo-slot" />
             </div>
           </article>
 
@@ -471,6 +413,8 @@ export default function Home() {
               </div>
             </div>
 
+            <PhotoSlot label="地方调研、观察与评价过程" note="建议呈现参与者在真实场景中的调研过程 · 16:6" className="framework-photo-slot" />
+
             <div className="method-flow">
               <div className="method-heading">
                 <span>CO-CREATION METHOD</span>
@@ -498,189 +442,6 @@ export default function Home() {
               <strong>制定战略与行动方案</strong>
             </div>
           </article>
-        </div>
-      </section>
-
-      <section className="carbon-section" id="carbon">
-        <div className="section-shell">
-          <div className="section-heading carbon-heading">
-            <div>
-              <span className="eyebrow"><i /> PERSONAL CARBON FOOTPRINT</span>
-              <h2>看见你的日常，<br />如何影响气候。</h2>
-            </div>
-            <p>
-              用大约 3 分钟完成一次个人碳足迹估算。认识主要排放来源，
-              再选择一件真正适合自己的低碳行动。
-            </p>
-          </div>
-
-          <div className="carbon-calculator">
-            <div className="carbon-progress" aria-label="碳足迹估算进度">
-              {carbonSteps.map((step, index) => (
-                <button
-                  key={step}
-                  className={carbonStep === index ? "active" : carbonStep > index ? "complete" : ""}
-                  onClick={() => setCarbonStep(index)}
-                  aria-current={carbonStep === index ? "step" : undefined}
-                >
-                  <span>{carbonStep > index ? "✓" : `0${index + 1}`}</span>
-                  <strong>{step}</strong>
-                </button>
-              ))}
-            </div>
-
-            <div className="carbon-workspace">
-              <div className="carbon-form-panel">
-                {carbonStep === 0 && (
-                  <div className="carbon-question-group">
-                    <span className="question-kicker">01 · HOME & ENERGY</span>
-                    <h3>你的居住空间使用多少能源？</h3>
-                    <p>家庭能源按共同居住人数分摊，得到更接近个人生活的估算。</p>
-                    <div className="carbon-fields three-fields">
-                      <label>
-                        <span>共同居住人数</span>
-                        <div><input min="1" max="20" type="number" value={carbonAnswers.householdSize} onChange={(event) => setCarbonAnswers({ ...carbonAnswers, householdSize: Number(event.target.value) })} /><small>人</small></div>
-                      </label>
-                      <label>
-                        <span>每月用电量</span>
-                        <div><input min="0" type="number" value={carbonAnswers.electricityMonthly} onChange={(event) => setCarbonAnswers({ ...carbonAnswers, electricityMonthly: Number(event.target.value) })} /><small>kWh</small></div>
-                      </label>
-                      <label>
-                        <span>每月天然气</span>
-                        <div><input min="0" type="number" value={carbonAnswers.gasMonthly} onChange={(event) => setCarbonAnswers({ ...carbonAnswers, gasMonthly: Number(event.target.value) })} /><small>m³</small></div>
-                      </label>
-                    </div>
-                    <div className="carbon-tip"><span>提示</span>账单或能源供应商小程序通常会显示月度用量；不确定时可保留示例值。</div>
-                  </div>
-                )}
-
-                {carbonStep === 1 && (
-                  <div className="carbon-question-group">
-                    <span className="question-kicker">02 · MOBILITY</span>
-                    <h3>一周里，你通常怎样移动？</h3>
-                    <p>填写日常里程和过去一年往返飞行次数，步行与骑行无需计入。</p>
-                    <div className="carbon-fields two-fields">
-                      <label>
-                        <span>驾车 / 网约车里程</span>
-                        <div><input min="0" type="number" value={carbonAnswers.carKmWeekly} onChange={(event) => setCarbonAnswers({ ...carbonAnswers, carKmWeekly: Number(event.target.value) })} /><small>公里 / 周</small></div>
-                      </label>
-                      <label>
-                        <span>公共交通里程</span>
-                        <div><input min="0" type="number" value={carbonAnswers.transitKmWeekly} onChange={(event) => setCarbonAnswers({ ...carbonAnswers, transitKmWeekly: Number(event.target.value) })} /><small>公里 / 周</small></div>
-                      </label>
-                      <label>
-                        <span>短途往返飞行</span>
-                        <div><input min="0" type="number" value={carbonAnswers.shortFlightsYearly} onChange={(event) => setCarbonAnswers({ ...carbonAnswers, shortFlightsYearly: Number(event.target.value) })} /><small>次 / 年</small></div>
-                      </label>
-                      <label>
-                        <span>长途往返飞行</span>
-                        <div><input min="0" type="number" value={carbonAnswers.longFlightsYearly} onChange={(event) => setCarbonAnswers({ ...carbonAnswers, longFlightsYearly: Number(event.target.value) })} /><small>次 / 年</small></div>
-                      </label>
-                    </div>
-                  </div>
-                )}
-
-                {carbonStep === 2 && (
-                  <div className="carbon-question-group">
-                    <span className="question-kicker">03 · FOOD & CONSUMPTION</span>
-                    <h3>你的餐桌与消费习惯是什么样？</h3>
-                    <p>不用追求绝对精确，选择最接近过去三个月平均状态的答案。</p>
-                    <label className="range-field">
-                      <span><strong>每周含肉餐食</strong><b>{carbonAnswers.meatMealsWeekly} 餐</b></span>
-                      <input min="0" max="21" type="range" value={carbonAnswers.meatMealsWeekly} onChange={(event) => setCarbonAnswers({ ...carbonAnswers, meatMealsWeekly: Number(event.target.value) })} />
-                      <small><i>以植物为主</i><i>几乎每餐含肉</i></small>
-                    </label>
-                    <fieldset className="choice-field">
-                      <legend>家庭食物浪费情况</legend>
-                      <div>
-                        {(["low", "medium", "high"] as const).map((value, index) => (
-                          <button key={value} type="button" className={carbonAnswers.foodWaste === value ? "active" : ""} onClick={() => setCarbonAnswers({ ...carbonAnswers, foodWaste: value })}>
-                            {index === 0 ? "很少浪费" : index === 1 ? "偶尔浪费" : "经常浪费"}
-                          </button>
-                        ))}
-                      </div>
-                    </fieldset>
-                    <fieldset className="choice-field">
-                      <legend>服装、电子产品与日用品消费</legend>
-                      <div>
-                        {(["low", "moderate", "high"] as const).map((value, index) => (
-                          <button key={value} type="button" className={carbonAnswers.shopping === value ? "active" : ""} onClick={() => setCarbonAnswers({ ...carbonAnswers, shopping: value })}>
-                            {index === 0 ? "按需且耐用" : index === 1 ? "一般频率" : "经常购买"}
-                          </button>
-                        ))}
-                      </div>
-                    </fieldset>
-                  </div>
-                )}
-
-                {carbonStep === 3 && (
-                  <div className="carbon-result-copy">
-                    <span className="question-kicker">YOUR ESTIMATED FOOTPRINT</span>
-                    <h3>你一年大约产生</h3>
-                    <div className="result-total"><strong>{carbonResult.total.toFixed(1)}</strong><span>吨 CO₂e<br />/ 人 · 年</span></div>
-                    <p>
-                      当前占比最高的是<strong>{carbonResult.largest.label}</strong>。
-                      这不是一张“环保成绩单”，而是帮助你决定从哪里开始的生活快照。
-                    </p>
-                    <div className="result-breakdown">
-                      {carbonResult.categories.map((category) => (
-                        <div key={category.key}>
-                          <span><strong>{category.label}</strong><b>{category.value.toFixed(1)} 吨</b></span>
-                          <i><b style={{ width: `${Math.max(3, (category.value / carbonResult.total) * 100)}%`, background: category.color }} /></i>
-                        </div>
-                      ))}
-                    </div>
-                  </div>
-                )}
-
-                <div className="carbon-controls">
-                  <button className="carbon-reset" onClick={() => { setCarbonAnswers(defaultCarbonAnswers); setCarbonStep(0); }}>重置估算</button>
-                  <div>
-                    {carbonStep > 0 && <button className="carbon-back" onClick={() => setCarbonStep(carbonStep - 1)}>上一步</button>}
-                    {carbonStep < 3 ? (
-                      <button className="primary-button" onClick={() => setCarbonStep(carbonStep + 1)}>
-                        {carbonStep === 2 ? "查看结果" : "下一步"} <span>→</span>
-                      </button>
-                    ) : (
-                      <button className="primary-button" onClick={() => setCarbonStep(0)}>重新计算 <span>↻</span></button>
-                    )}
-                  </div>
-                </div>
-              </div>
-
-              <aside className="carbon-live-panel" aria-live="polite">
-                {carbonStep < 3 ? (
-                  <>
-                    <span className="live-label">实时估算 · LIVE ESTIMATE</span>
-                    <div className="carbon-gauge" style={{ "--gauge": `${Math.min(100, carbonResult.total * 12)}%` } as React.CSSProperties}>
-                      <div><strong>{carbonResult.total.toFixed(1)}</strong><span>吨 CO₂e / 年</span></div>
-                    </div>
-                    <p>完成每一步，估算会随你的答案更新。</p>
-                    <div className="live-source"><span>当前主要来源</span><strong>{carbonResult.largest.label}</strong></div>
-                  </>
-                ) : (
-                  <>
-                    <span className="live-label">从今天开始 · YOUR NEXT MOVES</span>
-                    <h3>三个可尝试的下一步</h3>
-                    <ol className="carbon-actions">
-                      {carbonSuggestions.map(([title, description], index) => (
-                        <li key={title}><span>0{index + 1}</span><div><strong>{title}</strong><p>{description}</p></div></li>
-                      ))}
-                    </ol>
-                  </>
-                )}
-              </aside>
-            </div>
-          </div>
-
-          <div className="carbon-method-note">
-            <span>关于本次估算</span>
-            <p>
-              本模块借鉴个人生活方式计算器的“测量—理解—行动”结构，采用公开常见排放因子的简化模型，
-              覆盖家庭用能、交通、飞行、饮食、食物浪费与日常消费。结果仅用于公众教育和行动启发，
-              不替代专业碳盘查或第三方核证；后续将持续校准中国本地化因子。
-            </p>
-          </div>
         </div>
       </section>
 
@@ -750,6 +511,7 @@ export default function Home() {
               </div>
               <h3>{currentPlace.title}</h3>
               <p>{currentPlace.description}</p>
+              <PhotoSlot label={`${currentPlace.title}现场照片`} note="建议使用地点全景或观察活动照片 · 3:2" className="place-photo-slot" />
               <div className="detail-meta">
                 <div><small>下一场</small><strong>{currentPlace.date} · 09:30</strong></div>
                 <div><small>剩余席位</small><strong>{currentPlace.seats} 人</strong></div>
@@ -798,6 +560,7 @@ export default function Home() {
             ))}
           </div>
           <div className="micro-course">
+            <PhotoSlot label="微课封面图片" note="建议使用与课程议题相关的横版照片 · 4:3" className="course-photo-slot" />
             <div>
               <span className="course-label">本周推荐微课 · 18 MIN</span>
               <h3>城市里的一场雨，最终去了哪里？</h3>
@@ -830,6 +593,7 @@ export default function Home() {
             <article key={place.id} className={`workshop-card workshop-${index + 1}`}>
               <div className="workshop-visual">
                 <span className="workshop-topic">{place.topic}</span>
+                <span className="workshop-photo-label">＋ 活动照片预留 · 4:3</span>
                 <div className="visual-line line-one" />
                 <div className="visual-line line-two" />
                 <div className="visual-dot" />
@@ -867,6 +631,7 @@ export default function Home() {
             <button className="text-button inverted" onClick={() => setToast("成果地图将在下一版本开放")}>
               查看公开成果地图 <span>↗</span>
             </button>
+            <PhotoSlot label="公众行动与项目成果" note="建议使用行动记录、前后对比或集体合影 · 3:2" className="impact-photo-slot" />
           </div>
           <div className="impact-stats">
             {stories.map((story, index) => (
@@ -913,7 +678,7 @@ export default function Home() {
             <p>探索地方 · 共同学习 · 采取行动</p>
           </div>
           <div className="footer-links">
-            <div><strong>参与</strong><a href="#carbon">个人碳足迹</a><a href="#places">探索地点</a><a href="#workshops">工作坊</a><a href="#learning">线上微课</a></div>
+            <div><strong>参与</strong><a href="#places">探索地点</a><a href="#workshops">工作坊</a><a href="#learning">线上微课</a></div>
             <div><strong>关于</strong><a href="#about">项目介绍</a><a href="#impact">项目成果</a><button onClick={() => setToast("合作咨询入口将在下一版本开放")}>机构合作</button></div>
             <div><strong>联系</strong><span>hello@yixun.place</span><span>上海 · 中国</span></div>
           </div>
