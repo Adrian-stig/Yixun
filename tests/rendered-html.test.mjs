@@ -34,6 +34,10 @@ test("server-renders the YIXUN PLACE homepage", async () => {
   assert.match(html, /项目背景/);
   assert.match(html, /项目目标/);
   assert.match(html, /评价体系/);
+  assert.match(html, /个人碳足迹/);
+  assert.match(html, /居住与能源/);
+  assert.match(html, /日常出行/);
+  assert.match(html, /饮食与消费/);
   assert.doesNotMatch(html, /codex-preview/);
   assert.doesNotMatch(html, /Your site is taking shape/);
 });
