@@ -224,8 +224,8 @@ export default function Home() {
             <em>让学习成为行动。</em>
           </h1>
           <p className="hero-lead">
-            连接城市中的可持续实践地点、线下工作坊与公众行动。
-            和我们一起观察、学习，并完成一件真正发生的事。
+            连接自然、社区与可持续实践者，
+            通过真实地点探索, 让每一次学习都转化为具体行动。1111111111
           </p>
           <div className="hero-actions">
             <button className="primary-button" onClick={() => scrollTo("places")}>
