@@ -1,5 +1,6 @@
 "use client";
 
+import Image from "next/image";
 import { useEffect, useMemo, useState } from "react";
 
 type Place = {
@@ -11,58 +12,82 @@ type Place = {
   x: number;
   y: number;
   date: string;
-  seats: number;
+  seats: number | null;
   description: string;
 };
 
 const places: Place[] = [
   {
     id: 1,
-    title: "苏州河生态步道",
-    district: "普陀区",
-    topic: "城市与水",
-    accent: "#31786f",
-    x: 29,
-    y: 31,
-    date: "8月17日",
-    seats: 8,
-    description: "沿河观察生境、雨洪设施与城市更新，制作一份公众友好的河岸观察记录。",
+    title: "致良田农场",
+    district: "内蒙古阿拉善",
+    topic: "生态农业",
+    accent: "#9baa63",
+    x: 44.3,
+    y: 31.6,
+    date: "开放时间待公布",
+    seats: null,
+    description: "在干旱地区的农业场景中观察土壤、水资源与生产方式之间的关系，理解生态农业如何回应地方环境。",
   },
   {
     id: 2,
-    title: "嘉定社区农园",
-    district: "嘉定区",
-    topic: "食物系统",
-    accent: "#e26f43",
-    x: 68,
-    y: 23,
-    date: "8月24日",
-    seats: 12,
-    description: "从一平方米菜地出发，认识土壤、堆肥与本地食物网络的真实运作。",
+    title: "大音谷林场",
+    district: "浙江安吉",
+    topic: "可持续森林",
+    accent: "#244d2d",
+    x: 64.2,
+    y: 49.4,
+    date: "开放时间待公布",
+    seats: null,
+    description: "走进林场，理解森林经营、水源涵养与社区发展之间的协同关系，探索长期可持续的管理方式。",
   },
   {
     id: 3,
-    title: "零废弃生活实验室",
-    district: "徐汇区",
-    topic: "循环生活",
-    accent: "#d39d32",
-    x: 46,
-    y: 59,
-    date: "9月7日",
-    seats: 5,
-    description: "跟随实践者拆解日常废弃物，并共同设计一次可执行的减废挑战。",
+    title: "九龙峰自然保护区",
+    district: "安徽黄山",
+    topic: "生物多样性",
+    accent: "#62745d",
+    x: 61.4,
+    y: 53.2,
+    date: "开放时间待公布",
+    seats: null,
+    description: "围绕自然保护、生物多样性和社区参与，观察保护区如何协调生态保护与地方发展的长期需要。",
   },
   {
     id: 4,
-    title: "东滩湿地观鸟点",
-    district: "崇明区",
-    topic: "生物多样性",
-    accent: "#5c7d4d",
-    x: 79,
-    y: 69,
-    date: "9月14日",
-    seats: 16,
-    description: "用公民科学方法记录鸟类与潮间带生境，理解城市与自然的相互依存。",
+    title: "荣山寮与北港岛",
+    district: "海南海口",
+    topic: "可持续渔业",
+    accent: "#668993",
+    x: 50,
+    y: 75,
+    date: "开放时间待公布",
+    seats: null,
+    description: "从海岸社区出发，理解渔业生计、海洋生态与村庄可持续发展的相互依存，寻找社区共同行动的可能。",
+  },
+  {
+    id: 5,
+    title: "营盘山茶博园",
+    district: "云南普洱",
+    topic: "生态农业",
+    accent: "#9baa63",
+    x: 38.4,
+    y: 67.8,
+    date: "开放时间待公布",
+    seats: null,
+    description: "在茶园系统中观察生态农业、茶产业与地方文化如何相互支持，并共同创造长期的地方价值。",
+  },
+  {
+    id: 6,
+    title: "雪木村",
+    district: "云南丽江",
+    topic: "可持续村庄",
+    accent: "#a06a1c",
+    x: 37.7,
+    y: 58.4,
+    date: "开放时间待公布",
+    seats: null,
+    description: "从村落景观、传统生活与社区协作出发，理解地方文化的延续，并探索可持续村庄的发展路径。",
   },
 ];
 
@@ -81,35 +106,43 @@ const frameworkDimensions = [
     english: "Sustainable Management",
     description: "关注地方是否具备清晰的长期愿景、协作机制与资源配置能力，让可持续行动能够被组织、延续和迭代。",
     focus: ["长期战略", "多方治理", "资源协同"],
-  },
-  {
-    id: "nature",
-    number: "02",
-    title: "生态自然保护",
-    english: "Environmental Protection",
-    description: "从生态系统与自然资源出发，观察生物多样性、环境压力、保护行动与生态韧性之间的关系。",
-    focus: ["生态保护", "资源利用", "环境韧性"],
-  },
-  {
-    id: "culture",
-    number: "03",
-    title: "文化保护",
-    english: "Cultural Protection",
-    description: "理解地方知识、文化记忆与社区认同如何被尊重、传承，并在发展过程中持续发挥价值。",
-    focus: ["地方知识", "文化传承", "社区认同"],
+    image: "/framework/sustainable-management.png",
+    accent: "#4b61a5",
   },
   {
     id: "value",
-    number: "04",
+    number: "02",
     title: "创造社会和经济价值",
     english: "Socio-economic Value",
     description: "关注发展成果能否改善在地生计、促进社会包容与创新，并在参与者之间形成负责任的价值共享。",
     focus: ["在地生计", "社会创新", "价值共享"],
+    image: "/framework/socio-economic-value.png",
+    accent: "#e6ad26",
+  },
+  {
+    id: "nature",
+    number: "03",
+    title: "生态自然保护",
+    english: "Environmental Protection",
+    description: "从生态系统与自然资源出发，观察生物多样性、环境压力、保护行动与生态韧性之间的关系。",
+    focus: ["生态保护", "资源利用", "环境韧性"],
+    image: "/framework/environmental-protection.png",
+    accent: "#355f46",
+  },
+  {
+    id: "culture",
+    number: "04",
+    title: "文化保护",
+    english: "Cultural Protection",
+    description: "理解地方知识、文化记忆与社区认同如何被尊重、传承，并在发展过程中持续发挥价值。",
+    focus: ["地方知识", "文化传承", "社区认同"],
+    image: "/framework/cultural-protection.png",
+    accent: "#c83a36",
   },
 ];
 
 const stories = [
-  { value: "1,286", label: "次公众观察", note: "覆盖 24 个真实地点" },
+  { value: "1,286", label: "次公众观察", note: "覆盖 6 个真实项目地点" },
   { value: "4,920", label: "小时共同行动", note: "由学习者与志愿者完成" },
   { value: "78%", label: "行动任务完成率", note: "工作坊结束后 30 天内" },
 ];
@@ -165,20 +198,22 @@ export default function Home() {
     event.preventDefault();
     setJoined(true);
     setSignupOpen(false);
-    setToast(`已预留「${currentPlace.title}」席位`);
+    setToast(`已登记「${currentPlace.title}」工作坊意向`);
   };
 
   return (
     <main>
       <header className="site-header">
         <a className="brand" href="#top" aria-label="返回首页">
-          <span className="brand-mark" aria-hidden="true">
-            <i />
-            <b />
-          </span>
-          <span>
-            <strong>一循地方</strong>
-            <small>YIXUN PLACE</small>
+          <span className="brand-logo-viewport">
+            <Image
+              className="brand-logo"
+              src="/brand/yixun-logo.png"
+              alt="一循地方 YIXUN PLACE"
+              width={355}
+              height={285}
+              priority
+            />
           </span>
         </a>
 
@@ -243,32 +278,38 @@ export default function Home() {
           </div>
         </div>
 
-        <div className="hero-map" aria-label="可持续行动地点概览">
-          <div className="map-orbit orbit-one" />
-          <div className="map-orbit orbit-two" />
-          <div className="map-land land-one" />
-          <div className="map-land land-two" />
-          <div className="map-land land-three" />
-          <span className="map-label label-north">水系修复</span>
-          <span className="map-label label-east">湿地保育</span>
-          <span className="map-label label-south">社区营造</span>
-          {places.map((place, index) => (
-            <button
-              key={place.id}
-              className={`hero-pin pin-${index + 1}`}
-              style={{ "--pin-color": place.accent } as React.CSSProperties}
-              onClick={() => {
-                setActivePlace(place.id);
-                scrollTo("places");
-              }}
-              aria-label={`查看${place.title}`}
-            >
-              <span>{place.id}</span>
-            </button>
-          ))}
+        <div className="hero-map" aria-label="一循地方真实项目地点概览">
+          <div className="real-map-stage hero-map-stage">
+            <Image
+              className="real-map-image"
+              src="/maps/yixun-project-map.png"
+              alt="一循地方在中国六个真实项目地点的分布地图"
+              fill
+              sizes="(max-width: 760px) 100vw, 52vw"
+              priority
+            />
+            {places.map((place) => (
+              <button
+                key={place.id}
+                className="hero-pin"
+                style={{
+                  left: `${place.x}%`,
+                  top: `${place.y}%`,
+                  "--pin-color": place.accent,
+                } as React.CSSProperties}
+                onClick={() => {
+                  setActivePlace(place.id);
+                  scrollTo("places");
+                }}
+                aria-label={`查看${place.district}${place.title}`}
+              >
+                <span>{place.id}</span>
+              </button>
+            ))}
+          </div>
           <div className="map-note">
-            <span>本月新增</span>
-            <strong>6 个行动地点</strong>
+            <span>真实项目分布</span>
+            <strong>6 个在地实践点</strong>
           </div>
           <p className="map-caption">Explore Places · Learn Together · Take Action</p>
         </div>
@@ -395,14 +436,24 @@ export default function Home() {
                     className={activeDimension === dimension.id ? "active" : ""}
                     onClick={() => setActiveDimension(dimension.id)}
                     aria-pressed={activeDimension === dimension.id}
+                    aria-label={`查看${dimension.title}`}
+                    style={{ "--dimension-accent": dimension.accent } as React.CSSProperties}
                   >
-                    <span>{dimension.number}</span>
-                    <strong>{dimension.title}</strong>
-                    <small>{dimension.english}</small>
+                    <Image
+                      className="dimension-card-image"
+                      src={dimension.image}
+                      alt=""
+                      fill
+                      sizes="(max-width: 760px) 50vw, 25vw"
+                    />
                   </button>
                 ))}
               </div>
-              <div className="dimension-detail" aria-live="polite">
+              <div
+                className="dimension-detail"
+                aria-live="polite"
+                style={{ "--dimension-accent": currentDimension.accent } as React.CSSProperties}
+              >
                 <span className="dimension-number">{currentDimension.number}</span>
                 <small>{currentDimension.english}</small>
                 <h3>{currentDimension.title}</h3>
@@ -479,29 +530,31 @@ export default function Home() {
         {view === "map" ? (
           <div className="explore-grid">
             <div className="explore-map">
-              <div className="street street-a" />
-              <div className="street street-b" />
-              <div className="street street-c" />
-              <div className="river" />
-              <span className="district-label d-one">普陀</span>
-              <span className="district-label d-two">徐汇</span>
-              <span className="district-label d-three">浦东</span>
-              {filteredPlaces.map((place) => (
-                <button
-                  key={place.id}
-                  className={`place-pin ${activePlace === place.id ? "active" : ""}`}
-                  style={{
-                    left: `${place.x}%`,
-                    top: `${place.y}%`,
-                    "--pin-color": place.accent,
-                  } as React.CSSProperties}
-                  onClick={() => setActivePlace(place.id)}
-                  aria-label={`选择${place.title}`}
-                >
-                  <span>{place.id}</span>
-                </button>
-              ))}
-              <div className="map-legend"><span /> 可报名地点</div>
+              <div className="real-map-stage explore-map-stage">
+                <Image
+                  className="real-map-image"
+                  src="/maps/yixun-project-map.png"
+                  alt="一循地方真实项目地点地图"
+                  fill
+                  sizes="(max-width: 760px) 100vw, 65vw"
+                />
+                {filteredPlaces.map((place) => (
+                  <button
+                    key={place.id}
+                    className={`place-pin ${activePlace === place.id ? "active" : ""}`}
+                    style={{
+                      left: `${place.x}%`,
+                      top: `${place.y}%`,
+                      "--pin-color": place.accent,
+                    } as React.CSSProperties}
+                    onClick={() => setActivePlace(place.id)}
+                    aria-label={`选择${place.district}${place.title}`}
+                  >
+                    <span>{place.id}</span>
+                  </button>
+                ))}
+              </div>
+              <div className="map-legend"><span /> 点击编号查看地点</div>
             </div>
             <article className="place-detail">
               <div className="place-number">0{currentPlace.id}</div>
@@ -513,11 +566,11 @@ export default function Home() {
               <p>{currentPlace.description}</p>
               <PhotoSlot label={`${currentPlace.title}现场照片`} note="建议使用地点全景或观察活动照片 · 3:2" className="place-photo-slot" />
               <div className="detail-meta">
-                <div><small>下一场</small><strong>{currentPlace.date} · 09:30</strong></div>
-                <div><small>剩余席位</small><strong>{currentPlace.seats} 人</strong></div>
+                <div><small>工作坊安排</small><strong>{currentPlace.date}</strong></div>
+                <div><small>参与名额</small><strong>{currentPlace.seats ? `${currentPlace.seats} 人` : "待公布"}</strong></div>
               </div>
               <button className="primary-button full" onClick={() => setSignupOpen(true)}>
-                查看工作坊 <span>↗</span>
+                关注工作坊 <span>↗</span>
               </button>
             </article>
           </div>
@@ -584,9 +637,9 @@ export default function Home() {
         <div className="section-heading">
           <div>
             <span className="eyebrow"><i /> UPCOMING WORKSHOPS</span>
-            <h2>近期工作坊</h2>
+            <h2>项目工作坊</h2>
           </div>
-          <button className="text-button" onClick={() => setTopic("全部议题")}>查看全部活动 <span>→</span></button>
+          <button className="text-button" onClick={() => scrollTo("places")}>查看全部地点 <span>→</span></button>
         </div>
         <div className="workshop-grid">
           {places.slice(0, 3).map((place, index) => (
@@ -601,8 +654,8 @@ export default function Home() {
               </div>
               <div className="workshop-content">
                 <div className="workshop-date">
-                  <span>{place.date.slice(0, place.date.indexOf("月"))}月</span>
-                  <strong>{place.date.slice(place.date.indexOf("月") + 1, -1)}</strong>
+                  <span>项目</span>
+                  <strong>开放</strong>
                 </div>
                 <div>
                   <small>{place.district} · 3 小时 · 适合 15 岁以上</small>
@@ -672,8 +725,15 @@ export default function Home() {
         <div className="footer-main section-shell">
           <div className="footer-brand">
             <a className="brand" href="#top">
-              <span className="brand-mark inverse" aria-hidden="true"><i /><b /></span>
-              <span><strong>一循地方</strong><small>YIXUN PLACE</small></span>
+              <span className="brand-logo-viewport footer-logo-viewport">
+                <Image
+                  className="brand-logo"
+                  src="/brand/yixun-logo.png"
+                  alt="一循地方 YIXUN PLACE"
+                  width={355}
+                  height={285}
+                />
+              </span>
             </a>
             <p>探索地方 · 共同学习 · 采取行动</p>
           </div>
@@ -695,7 +755,7 @@ export default function Home() {
             <button className="modal-close" onClick={() => setSignupOpen(false)} aria-label="关闭">×</button>
             <span className="eyebrow"><i /> WORKSHOP SIGN-UP</span>
             <h2 id="signup-title">{currentPlace.title}</h2>
-            <p>{currentPlace.date} · 09:30–12:30<br />{currentPlace.district} · 剩余 {currentPlace.seats} 个席位</p>
+            <p>{currentPlace.date}<br />{currentPlace.district} · 名额待公布</p>
             <form onSubmit={submitSignup}>
               <label>你的姓名<input required placeholder="如何称呼你" /></label>
               <label>联系方式<input required type="email" placeholder="name@example.com" /></label>
@@ -704,7 +764,7 @@ export default function Home() {
                   <option>公众参与者</option><option>学生</option><option>教师</option><option>志愿者</option><option>公益组织</option>
                 </select>
               </label>
-              <button className="primary-button full" type="submit">确认预留席位 <span>→</span></button>
+              <button className="primary-button full" type="submit">登记参与意向 <span>→</span></button>
             </form>
             <small>这是 MVP 演示，提交后不会发送真实报名信息。</small>
           </div>
