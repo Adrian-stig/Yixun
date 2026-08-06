@@ -260,7 +260,7 @@ export default function Home() {
           </h1>
           <p className="hero-lead">
             连接自然、社区与可持续实践者，
-            通过真实地点探索, 让每一次学习都转化为具体行动。1111111111
+            通过真实地点探索，让每一次学习都转化为具体行动。
           </p>
           <div className="hero-actions">
             <button className="primary-button" onClick={() => scrollTo("places")}>
