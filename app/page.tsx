@@ -1,6 +1,7 @@
 "use client";
 
 import Image from "next/image";
+import Link from "next/link";
 import { useEffect, useMemo, useState } from "react";
 
 type Place = {
@@ -572,6 +573,11 @@ export default function Home() {
               <button className="primary-button full" onClick={() => setSignupOpen(true)}>
                 关注工作坊 <span>↗</span>
               </button>
+              {currentPlace.id === 3 && (
+                <Link className="place-deep-link" href="/places/huangshan">
+                  进入黄山专题页 <span>→</span>
+                </Link>
+              )}
             </article>
           </div>
         ) : (
