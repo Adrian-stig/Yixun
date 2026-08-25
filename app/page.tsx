@@ -687,9 +687,9 @@ export default function Home() {
             <span className="eyebrow"><i /> COLLECTIVE IMPACT</span>
             <h2>每一次观察，<br />都让改变更清晰。</h2>
             <p>项目成果向所有人开放。个人的小行动在这里被看见、积累，也成为学校、社区和公益组织继续行动的依据。</p>
-            <button className="text-button inverted" onClick={() => setToast("成果地图将在下一版本开放")}>
+            <Link className="text-button inverted" href="/impact">
               查看公开成果地图 <span>↗</span>
-            </button>
+            </Link>
             <PhotoSlot label="公众行动与项目成果" note="建议使用行动记录、前后对比或集体合影 · 3:2" className="impact-photo-slot" />
           </div>
           <div className="impact-stats">
