@@ -7,13 +7,22 @@ import styles from "./huangshan.module.css";
 
 type ValueCategory = "生态价值" | "社会价值" | "经济价值";
 
+type RelatedArticle = {
+  id: string;
+  tag: string;
+  readTime: string;
+  title: string;
+  summary: string;
+  coverHint: string;
+};
+
 type ForestValue = {
   id: string;
   number: string;
   category: ValueCategory;
   title: string;
   description: string;
-  observation: string;
+  articles: RelatedArticle[];
   accent: string;
   mark: string;
 };
@@ -25,7 +34,10 @@ const forestValues: ForestValue[] = [
     category: "生态价值",
     title: "固碳制氧",
     description: "森林能大量吸收二氧化碳、释放氧气，也能滞留空气中的悬浮颗粒，为区域空气质量和气候调节提供支持。",
-    observation: "抬头观察不同高度的树冠：层次越丰富，说明这片森林的空间结构越多样。",
+    articles: [
+      { id: "carbon-store", tag: "气候行动", readTime: "6 MIN", title: "森林如何成为看不见的碳库", summary: "从树干、枝叶到土壤，理解森林储存碳并调节区域气候的基本路径。", coverHint: "树冠、林地或碳循环示意图片" },
+      { id: "air-quality", tag: "森林科学", readTime: "5 MIN", title: "从一棵树到区域空气质量", summary: "森林不仅释放氧气，也通过复杂的空间结构拦截颗粒物、改善局地环境。", coverHint: "林冠层次或空气质量观察图片" },
+    ],
     accent: "#e45f36",
     mark: "气",
   },
@@ -35,7 +47,10 @@ const forestValues: ForestValue[] = [
     category: "生态价值",
     title: "净化环境 · 防风固沙",
     description: "森林植被的根系能够稳固土壤、减少水土流失；树冠与林下植被共同减缓风力和雨水对地表的直接冲击。",
-    observation: "比较林内与裸露地面的土壤状态，寻找落叶层、根系与地表径流留下的痕迹。",
+    articles: [
+      { id: "roots-and-soil", tag: "土壤保护", readTime: "7 MIN", title: "根系怎样把土壤留在山坡上", summary: "从植物根系与土壤颗粒的关系，理解森林防风固沙和减少侵蚀的能力。", coverHint: "根系、坡地土壤或侵蚀对比图片" },
+      { id: "forest-after-rain", tag: "极端天气", readTime: "6 MIN", title: "暴雨之后，森林如何减缓地表径流", summary: "树冠、枯落物和根系共同作用，让雨水不再快速冲刷裸露地表。", coverHint: "雨后森林、径流或落叶层图片" },
+    ],
     accent: "#e45f36",
     mark: "土",
   },
@@ -45,7 +60,10 @@ const forestValues: ForestValue[] = [
     category: "社会价值",
     title: "游憩资源 · 生态教育",
     description: "森林既是重要的自然景观资源，也是公众认识生态系统、开展自然观察与环境教育的真实课堂。",
-    observation: "留意步道、解说牌和观景点：它们如何帮助人们亲近自然，同时减少对栖息地的打扰？",
+    articles: [
+      { id: "learning-on-trails", tag: "生态教育", readTime: "5 MIN", title: "让自然教育发生在真实步道上", summary: "观察解说系统、自然导师与在地场景如何共同构成一堂开放的生态课。", coverHint: "自然步道、解说牌或公众活动图片" },
+      { id: "low-impact-recreation", tag: "友善游憩", readTime: "6 MIN", title: "如何设计低干扰的森林游憩", summary: "在公众亲近自然与物种栖息需求之间，寻找更负责任的空间设计。", coverHint: "观景点、游径或低干扰设施图片" },
+    ],
     accent: "#303a9d",
     mark: "游",
   },
@@ -55,7 +73,10 @@ const forestValues: ForestValue[] = [
     category: "生态价值",
     title: "保护生物多样性",
     description: "森林为多种动物、植物和微生物提供栖息地，也是复杂食物网与生态关系长期演化的重要空间。",
-    observation: "尝试在不采集、不惊扰的前提下，记录三种不同的生命迹象：声音、足迹或叶片。",
+    articles: [
+      { id: "signs-of-life", tag: "自然观察", readTime: "6 MIN", title: "用声音、足迹和叶片读懂森林生命", summary: "不采集、不惊扰，也能通过环境线索记录一片森林的物种多样性。", coverHint: "动物足迹、叶片或声音记录图片" },
+      { id: "habitat-first", tag: "生物多样性", readTime: "8 MIN", title: "为什么完整栖息地比单一物种更重要", summary: "从食物网与物种关系出发，理解保护连续生态空间的长期意义。", coverHint: "复层森林、野生动物或栖息地图片" },
+    ],
     accent: "#e45f36",
     mark: "生",
   },
@@ -65,7 +86,10 @@ const forestValues: ForestValue[] = [
     category: "生态价值",
     title: "土壤保育 · 水源涵养",
     description: "植被与枯落物能够截留降雨、减缓地表径流，让水分逐渐渗入地下，并通过土壤和根系形成自然的水分调节系统。",
-    observation: "雨后观察坡面、溪沟与林下土壤，判断水是快速流走，还是被森林慢慢留下。",
+    articles: [
+      { id: "keep-the-rain", tag: "水源涵养", readTime: "7 MIN", title: "一场雨如何被森林慢慢留下", summary: "追踪降雨从树冠、地表到地下的旅程，看见森林天然的水分调节机制。", coverHint: "降雨、溪沟或林下土壤图片" },
+      { id: "forest-sponge", tag: "土壤生态", readTime: "6 MIN", title: "枯落物、土壤与地下水的关系", summary: "森林地表像一层缓慢吸水的海绵，影响渗透、径流与区域水循环。", coverHint: "枯落物层、土壤剖面或泉水图片" },
+    ],
     accent: "#e45f36",
     mark: "水",
   },
@@ -75,7 +99,10 @@ const forestValues: ForestValue[] = [
     category: "经济价值",
     title: "林产品使用价值",
     description: "在负责任的经营与利用方式下，木材及相关林产品可以形成长期经济价值，同时需要与森林更新和生态承载力保持平衡。",
-    observation: "思考一件木制品的来源：它是否可追溯、可持续，并在使用结束后继续循环？",
+    articles: [
+      { id: "traceable-timber", tag: "责任消费", readTime: "6 MIN", title: "一件木制品的可持续来源", summary: "从原料追溯、森林经营到产品使用，认识负责任木材的完整链条。", coverHint: "木制品、林业经营或溯源标签图片" },
+      { id: "use-and-renewal", tag: "森林经营", readTime: "7 MIN", title: "森林利用与更新如何保持平衡", summary: "经济价值并不等于过度采伐，关键在于利用尺度、更新速度与生态承载力。", coverHint: "森林经营、更新林或木材加工图片" },
+    ],
     accent: "#00984f",
     mark: "木",
   },
@@ -85,7 +112,10 @@ const forestValues: ForestValue[] = [
     category: "经济价值",
     title: "林下生物使用价值",
     description: "森林中的动物、植物与微生物也具有食用、药用和研究价值，例如木耳与菌菇等林下资源。",
-    observation: "不要采摘。尝试记录林下物种与环境之间的关系，并询问当地人如何理解和利用这些资源。",
+    articles: [
+      { id: "understory-economy", tag: "林下经济", readTime: "6 MIN", title: "菌菇之外：森林里还有哪些地方产品", summary: "认识林下植物、微生物与地方知识如何转化为多样而克制的生计价值。", coverHint: "菌菇、林下植物或地方产品图片" },
+      { id: "observe-without-picking", tag: "友善观察", readTime: "5 MIN", title: "不采集，也能认识林下生物", summary: "用拍摄、记录与访谈替代采摘，在保护环境的同时理解资源利用方式。", coverHint: "林下物种、观察记录或社区访谈图片" },
+    ],
     accent: "#00984f",
     mark: "菌",
   },
@@ -164,6 +194,7 @@ type HuangshanExperienceProps = {
 export default function HuangshanExperience({ view }: HuangshanExperienceProps) {
   const isForest = view === "forest";
   const challengeRailRef = useRef<HTMLDivElement>(null);
+  const relatedRailRef = useRef<HTMLDivElement>(null);
   const [activeCategory, setActiveCategory] = useState<(typeof categories)[number]>("全部价值");
   const [activeValue, setActiveValue] = useState(forestValues[0].id);
   const [lightboxOpen, setLightboxOpen] = useState(false);
@@ -246,6 +277,10 @@ export default function HuangshanExperience({ view }: HuangshanExperienceProps) 
     return () => window.clearTimeout(timeout);
   }, [actionNotice]);
 
+  useEffect(() => {
+    if (relatedRailRef.current) relatedRailRef.current.scrollLeft = 0;
+  }, [activeValue]);
+
   const chooseCategory = (category: (typeof categories)[number]) => {
     setActiveCategory(category);
     const firstMatch = forestValues.find((item) => category === "全部价值" || item.category === category);
@@ -265,6 +300,14 @@ export default function HuangshanExperience({ view }: HuangshanExperienceProps) 
 
   const scrollChallenges = (direction: -1 | 1) => {
     const rail = challengeRailRef.current;
+    const firstCard = rail?.querySelector<HTMLElement>("article");
+    if (!rail || !firstCard) return;
+    const gap = Number.parseFloat(window.getComputedStyle(rail).columnGap || "0");
+    rail.scrollBy({ left: direction * (firstCard.offsetWidth + gap), behavior: "smooth" });
+  };
+
+  const scrollRelatedArticles = (direction: -1 | 1) => {
+    const rail = relatedRailRef.current;
     const firstCard = rail?.querySelector<HTMLElement>("article");
     if (!rail || !firstCard) return;
     const gap = Number.parseFloat(window.getComputedStyle(rail).columnGap || "0");
@@ -570,7 +613,7 @@ export default function HuangshanExperience({ view }: HuangshanExperienceProps) 
         <div className={styles.valueIntro}>
           <span className={styles.eyebrow}>点击探索</span>
           <h2>一片森林，<br />正在创造哪些价值？</h2>
-          <p>选择价值类别与观察线索，理解图中的每一条关系，并获得一条可以在现场完成的观察提示。</p>
+          <p>选择价值类别与线索，理解图中的每一条关系，并通过相关文章继续深入阅读。</p>
         </div>
 
         <div className={styles.categoryTabs} role="tablist" aria-label="森林价值分类">
@@ -610,9 +653,46 @@ export default function HuangshanExperience({ view }: HuangshanExperienceProps) 
             <span>{currentValue.number} · {currentValue.category}</span>
             <h3>{currentValue.title}</h3>
             <p>{currentValue.description}</p>
-            <div className={styles.observationPrompt}>
-              <small>现场观察提示</small>
-              <strong>{currentValue.observation}</strong>
+            <div className={styles.relatedArticles}>
+              <div className={styles.relatedHeading}>
+                <div>
+                  <small>RELATED READING</small>
+                  <strong>相关文章</strong>
+                </div>
+                <div>
+                  <button type="button" onClick={() => scrollRelatedArticles(-1)} aria-label="查看上一篇相关文章">←</button>
+                  <button type="button" onClick={() => scrollRelatedArticles(1)} aria-label="查看下一篇相关文章">→</button>
+                </div>
+              </div>
+              <div
+                className={styles.relatedRail}
+                ref={relatedRailRef}
+                tabIndex={0}
+                aria-label={`${currentValue.title}相关文章走马灯`}
+              >
+                {currentValue.articles.map((article) => (
+                  <article className={styles.relatedCard} key={article.id}>
+                    <div className={styles.articleCover}>
+                      <span>＋</span>
+                      <small>ARTICLE COVER</small>
+                      <strong>{article.coverHint}</strong>
+                      <i>16:9</i>
+                    </div>
+                    <div className={styles.articleMeta}>
+                      <span>{article.tag}</span>
+                      <small>{article.readTime}</small>
+                    </div>
+                    <h4>{article.title}</h4>
+                    <p>{article.summary}</p>
+                    <button
+                      type="button"
+                      onClick={() => setActionNotice(`「${article.title}」文章入口已预留，接入正式链接后即可阅读`)}
+                    >
+                      文章入口预留 <span>↗</span>
+                    </button>
+                  </article>
+                ))}
+              </div>
             </div>
           </article>
         </div>
@@ -706,7 +786,7 @@ export default function HuangshanExperience({ view }: HuangshanExperienceProps) 
         </div>
       )}
 
-      {!isForest && actionNotice && <div className={styles.actionNotice} role="status">{actionNotice}</div>}
+      {actionNotice && <div className={styles.actionNotice} role="status">{actionNotice}</div>}
     </main>
   );
 }
