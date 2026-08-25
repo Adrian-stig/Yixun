@@ -150,7 +150,12 @@ function todayLabel() {
   return new Intl.DateTimeFormat("zh-CN", { month: "2-digit", day: "2-digit" }).format(new Date());
 }
 
-export default function HuangshanExperience() {
+type HuangshanExperienceProps = {
+  view: "forest" | "workshop";
+};
+
+export default function HuangshanExperience({ view }: HuangshanExperienceProps) {
+  const isForest = view === "forest";
   const [activeCategory, setActiveCategory] = useState<(typeof categories)[number]>("全部价值");
   const [activeValue, setActiveValue] = useState(forestValues[0].id);
   const [lightboxOpen, setLightboxOpen] = useState(false);
@@ -277,29 +282,56 @@ export default function HuangshanExperience() {
         <Link className={styles.brand} href="/#top" aria-label="返回一循地方首页">
           <Image src="/brand/yixun-logo.png" alt="一循地方 YIXUN PLACE" width={355} height={285} priority />
         </Link>
-        <nav aria-label="黄山专题页导航">
-          <a href="#about">认识九龙峰</a>
-          <a href="#workshop-action">行动共创</a>
-          <a href="#forest-values">森林价值</a>
-          <a href="#action">行动任务</a>
-        </nav>
+        {isForest ? (
+          <nav aria-label="可持续森林专题页导航">
+            <a href="#about">认识九龙峰</a>
+            <a href="#forest-values">森林价值</a>
+            <a href="#field-path">观察路径</a>
+            <Link href="/places/huangshan/workshop">工作坊行动</Link>
+          </nav>
+        ) : (
+          <nav aria-label="工作坊行动页导航">
+            <a href="#workshop-action">生态困境</a>
+            <a href="#daily-action-form">我的行动</a>
+            <a href="#action">在地实践</a>
+            <Link href="/places/huangshan/forest">可持续森林</Link>
+          </nav>
+        )}
         <Link className={styles.backLink} href="/#places">返回地点地图 <span>↗</span></Link>
       </header>
 
       <section className={styles.hero}>
         <div className={styles.heroCopy}>
           <span className={styles.kicker}>一循地方 · 第二站 · 安徽黄山</span>
-          <h1>读懂一片森林的<br /><em>多重价值</em></h1>
-          <p>以九龙峰自然保护区为例，从一棵树出发，看见森林如何连接气候、水土、生物、社区与人的生活。</p>
-          <div className={styles.heroActions}>
-            <a className={styles.primaryAction} href="#workshop-action">探索工作坊 <span>↓</span></a>
-            <button className={styles.secondaryAction} onClick={() => setLightboxOpen(true)}>查看森林价值图 <span>↗</span></button>
-          </div>
-          <div className={styles.heroMeta}>
-            <div><strong>03</strong><span>自然观察维度</span></div>
-            <div><strong>07</strong><span>森林价值线索</span></div>
-            <div><strong>01</strong><span>在地行动任务</span></div>
-          </div>
+          {isForest ? (
+            <>
+              <h1>读懂一片森林的<br /><em>多重价值</em></h1>
+              <p>以九龙峰自然保护区为例，从一棵树出发，看见森林如何连接气候、水土、生物、社区与人的生活。</p>
+              <div className={styles.heroActions}>
+                <a className={styles.primaryAction} href="#forest-values">探索森林价值 <span>↓</span></a>
+                <button className={styles.secondaryAction} onClick={() => setLightboxOpen(true)}>查看森林价值图 <span>↗</span></button>
+              </div>
+              <div className={styles.heroMeta}>
+                <div><strong>03</strong><span>森林价值维度</span></div>
+                <div><strong>07</strong><span>森林价值线索</span></div>
+                <div><strong>04</strong><span>现场观察动作</span></div>
+              </div>
+            </>
+          ) : (
+            <>
+              <h1>把地方的困境，<br /><em>带回日常行动</em></h1>
+              <p>工作坊已经结束，行动仍在继续。认识九龙峰的生态困难，从微课、分享和在地实践开始，建立与目的地的长期连接。</p>
+              <div className={styles.heroActions}>
+                <a className={styles.primaryAction} href="#workshop-action">开始行动 <span>↓</span></a>
+                <Link className={styles.secondaryAction} href="/places/huangshan/forest">探索可持续森林 <span>↗</span></Link>
+              </div>
+              <div className={styles.heroMeta}>
+                <div><strong>03</strong><span>目的地生态困境</span></div>
+                <div><strong>03</strong><span>持续行动阶段</span></div>
+                <div><strong>01</strong><span>地方产物奖励</span></div>
+              </div>
+            </>
+          )}
         </div>
         <div className={styles.heroForest} aria-hidden="true">
           <span className={styles.sun} />
@@ -308,10 +340,14 @@ export default function HuangshanExperience() {
           <span className={`${styles.tree} ${styles.treeThree}`} />
           <span className={`${styles.tree} ${styles.treeFour}`} />
           <span className={styles.ground} />
-          <div className={styles.heroLabel}><span>专题地点</span><strong>九龙峰自然保护区</strong></div>
+          <div className={styles.heroLabel}>
+            <span>{isForest ? "可持续森林专题" : "工作坊持续行动"}</span>
+            <strong>九龙峰自然保护区</strong>
+          </div>
         </div>
       </section>
 
+      {isForest && (
       <section className={styles.about} id="about">
         <div className={styles.sectionIndex}><span>01</span><small>PLACE STORY</small></div>
         <div className={styles.aboutCopy}>
@@ -325,7 +361,9 @@ export default function HuangshanExperience() {
           <div><span>核心议题</span><strong>生物多样性</strong></div>
         </aside>
       </section>
+      )}
 
+      {!isForest && (
       <section className={styles.workshopSection} id="workshop-action">
         <div className={styles.workshopHeading}>
           <div>
@@ -442,7 +480,10 @@ export default function HuangshanExperience() {
           </aside>
         </div>
       </section>
+      )}
 
+      {isForest && (
+      <>
       <section className={styles.visualSection}>
         <div className={styles.visualHeading}>
           <div>
@@ -535,7 +576,10 @@ export default function HuangshanExperience() {
           ))}
         </div>
       </section>
+      </>
+      )}
 
+      {!isForest && (
       <section className={styles.actionSection} id="action">
         <div className={styles.actionCopy}>
           <span className={styles.eyebrow}>TAKE ACTION</span>
@@ -557,14 +601,27 @@ export default function HuangshanExperience() {
           })}
         </div>
       </section>
+      )}
 
       <section className={styles.nextSection}>
         <span className={styles.eyebrow}>CONTINUE THE JOURNEY</span>
-        <h2>从一片森林出发，<br />继续理解更多地方。</h2>
-        <div>
-          <Link className={styles.primaryAction} href="/#places">返回地点地图 <span>↗</span></Link>
-          <Link className={styles.secondaryAction} href="/#learning">学习相关微课 <span>↗</span></Link>
-        </div>
+        {isForest ? (
+          <>
+            <h2>理解森林之后，<br />把知识带进行动。</h2>
+            <div>
+              <Link className={styles.primaryAction} href="/places/huangshan/workshop">进入工作坊行动页 <span>↗</span></Link>
+              <Link className={styles.secondaryAction} href="/#places">返回地点地图 <span>↗</span></Link>
+            </div>
+          </>
+        ) : (
+          <>
+            <h2>完成一次行动，<br />继续读懂它所连接的森林。</h2>
+            <div>
+              <Link className={styles.primaryAction} href="/places/huangshan/forest">进入可持续森林专题 <span>↗</span></Link>
+              <Link className={styles.secondaryAction} href="/#places">返回地点地图 <span>↗</span></Link>
+            </div>
+          </>
+        )}
       </section>
 
       <footer className={styles.footer}>
@@ -573,7 +630,7 @@ export default function HuangshanExperience() {
         <Link href="/#top">返回一循地方首页 ↑</Link>
       </footer>
 
-      {lightboxOpen && (
+      {isForest && lightboxOpen && (
         <div className={styles.lightbox} role="dialog" aria-modal="true" aria-label="九龙峰森林价值图大图" onClick={() => setLightboxOpen(false)}>
           <button className={styles.lightboxClose} onClick={() => setLightboxOpen(false)} aria-label="关闭大图">×</button>
           <div className={styles.lightboxScroll} onClick={(event) => event.stopPropagation()}>
@@ -589,7 +646,7 @@ export default function HuangshanExperience() {
         </div>
       )}
 
-      {actionNotice && <div className={styles.actionNotice} role="status">{actionNotice}</div>}
+      {!isForest && actionNotice && <div className={styles.actionNotice} role="status">{actionNotice}</div>}
     </main>
   );
 }

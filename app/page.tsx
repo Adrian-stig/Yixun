@@ -574,14 +574,14 @@ export default function Home() {
               )}
               {currentPlace.id === 3 ? (
                 <div className="place-route-actions" aria-label="九龙峰探索入口">
-                  <Link className="place-route-button forest" href="/places/huangshan#forest-values">
+                  <Link className="place-route-button forest" href="/places/huangshan/forest">
                     <span>
                       <small>森林专题</small>
                       <strong>探索可持续森林</strong>
                     </span>
                     <b aria-hidden="true">↗</b>
                   </Link>
-                  <Link className="place-route-button workshop" href="/places/huangshan#workshop-action">
+                  <Link className="place-route-button workshop" href="/places/huangshan/workshop">
                     <span>
                       <small>工作坊已完成 · 持续行动开放</small>
                       <strong>探索工作坊</strong>
