@@ -573,9 +573,22 @@ export default function Home() {
                 </div>
               )}
               {currentPlace.id === 3 ? (
-                <Link className="primary-button full" href="/places/huangshan#workshop-action">
-                  探索工作坊 <span>↗</span>
-                </Link>
+                <div className="place-route-actions" aria-label="九龙峰探索入口">
+                  <Link className="place-route-button forest" href="/places/huangshan#forest-values">
+                    <span>
+                      <small>森林专题</small>
+                      <strong>探索可持续森林</strong>
+                    </span>
+                    <b aria-hidden="true">↗</b>
+                  </Link>
+                  <Link className="place-route-button workshop" href="/places/huangshan#workshop-action">
+                    <span>
+                      <small>工作坊已完成 · 持续行动开放</small>
+                      <strong>探索工作坊</strong>
+                    </span>
+                    <b aria-hidden="true">↗</b>
+                  </Link>
+                </div>
               ) : (
                 <button className="primary-button full" onClick={() => setSignupOpen(true)}>
                   关注工作坊 <span>↗</span>
@@ -590,7 +603,8 @@ export default function Home() {
                 key={place.id}
                 onClick={() => {
                   if (place.id === 3) {
-                    window.location.href = "/places/huangshan#workshop-action";
+                    setActivePlace(place.id);
+                    setView("map");
                     return;
                   }
                   setActivePlace(place.id);

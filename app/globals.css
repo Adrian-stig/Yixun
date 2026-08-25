@@ -2925,3 +2925,76 @@ footer {
   background: #e7b75c;
   transform: translateY(-2px);
 }
+
+.place-route-actions {
+  display: grid;
+  gap: 10px;
+  margin-top: auto;
+}
+
+.place-route-button {
+  display: flex;
+  min-height: 64px;
+  align-items: center;
+  justify-content: space-between;
+  padding: 11px 19px;
+  border: 1px solid var(--forest);
+  border-radius: 999px;
+  transition: background 0.2s ease, color 0.2s ease, transform 0.2s ease;
+}
+
+.place-route-button > span {
+  display: flex;
+  flex-direction: column;
+  gap: 3px;
+}
+
+.place-route-button small {
+  font-size: 8px;
+  font-weight: 500;
+  letter-spacing: 0.08em;
+  opacity: 0.62;
+}
+
+.place-route-button strong {
+  font-size: 13px;
+  font-weight: 600;
+  letter-spacing: 0.03em;
+}
+
+.place-route-button b {
+  font-size: 17px;
+  font-weight: 400;
+}
+
+.place-route-button.forest {
+  background: var(--forest);
+  color: white;
+}
+
+.place-route-button.workshop {
+  background: transparent;
+  color: var(--forest);
+}
+
+.place-route-button:hover,
+.place-route-button:focus-visible {
+  transform: translateY(-2px);
+}
+
+.place-route-button.forest:hover,
+.place-route-button.forest:focus-visible {
+  background: var(--forest-dark);
+}
+
+.place-route-button.workshop:hover,
+.place-route-button.workshop:focus-visible {
+  background: #eee5cf;
+}
+
+@media (max-width: 760px) {
+  .place-route-button {
+    min-height: 58px;
+    padding: 10px 17px;
+  }
+}
