@@ -241,7 +241,6 @@ export default function ImpactExperience() {
   const [activeLocation, setActiveLocation] = useState(1);
   const [activeFeedbackId, setActiveFeedbackId] = useState(seedFeedbacks[0].id);
   const [reply, setReply] = useState("");
-  const [lightboxOpen, setLightboxOpen] = useState(false);
   const [storageReady, setStorageReady] = useState(false);
   const [notice, setNotice] = useState("");
 
@@ -272,19 +271,6 @@ export default function ImpactExperience() {
   }, [feedbacks, storageReady]);
 
   useEffect(() => {
-    if (!lightboxOpen) return;
-    const onKeyDown = (event: KeyboardEvent) => {
-      if (event.key === "Escape") setLightboxOpen(false);
-    };
-    document.addEventListener("keydown", onKeyDown);
-    document.body.style.overflow = "hidden";
-    return () => {
-      document.removeEventListener("keydown", onKeyDown);
-      document.body.style.overflow = "";
-    };
-  }, [lightboxOpen]);
-
-  useEffect(() => {
     if (!notice) return;
     const timeout = window.setTimeout(() => setNotice(""), 2600);
     return () => window.clearTimeout(timeout);
@@ -296,9 +282,6 @@ export default function ImpactExperience() {
     () => feedbacks.filter((item) => activeLocation === 0 || item.locationId === activeLocation),
     [activeLocation, feedbacks],
   );
-  const totalLikes = feedbacks.reduce((sum, item) => sum + item.likes, 0);
-  const totalReplies = feedbacks.reduce((sum, item) => sum + item.replies.length, 0);
-
   const chooseLocation = (locationId: number) => {
     setActiveLocation(locationId);
     const first = feedbacks.find((item) => locationId === 0 || item.locationId === locationId);
@@ -379,29 +362,10 @@ export default function ImpactExperience() {
         </Link>
         <nav aria-label="成果地图页面导航">
           <a href="#community-map">成果地图</a>
-          <a href="#source-story">反馈故事</a>
           <a href="#new-feedback">发表反馈</a>
         </nav>
         <Link className={styles.backLink} href="/#impact">返回行动成果 <span>↗</span></Link>
       </header>
-
-      <section className={styles.hero}>
-        <div className={styles.heroCopy}>
-          <span className={styles.kicker}><i /> COLLECTIVE IMPACT</span>
-          <h1>每一种声音，<br />都让地方的改变<br /><em>被看见。</em></h1>
-          <p>从工作坊结束后的真实反馈出发，按地点看见参与者获得的新理解、提出的新问题，以及正在发生的小行动。</p>
-          <div className={styles.heroActions}>
-            <a href="#community-map" className={styles.primaryAction}>进入成果地图 <span>↓</span></a>
-            <a href="#new-feedback" className={styles.secondaryAction}>留下我的反馈 <span>↗</span></a>
-          </div>
-          <div className={styles.privacyNote}><span>匿名公开</span> 默认不展示真实姓名与联系方式</div>
-        </div>
-        <div className={styles.heroStats}>
-          <article><span>01</span><strong>{feedbacks.length}</strong><h2>条参与者反馈</h2><p>含工作坊回访与示例记录</p></article>
-          <article><span>02</span><strong>{totalLikes}</strong><h2>次社区共鸣</h2><p>以及 {totalReplies} 条持续对话</p></article>
-          <article><span>03</span><strong>{locations.length}</strong><h2>个真实地点</h2><p>从地方经验连接共同议题</p></article>
-        </div>
-      </section>
 
       <section className={styles.mapSection} id="community-map">
         <div className={styles.sectionHeading}>
@@ -506,23 +470,6 @@ export default function ImpactExperience() {
         <p className={styles.localNote}><span>首版说明</span> 点赞、回复和新反馈目前仅保存在你的当前设备；未来接入账号、审核与共享数据库后，才会成为所有访客可见的公共内容。</p>
       </section>
 
-      <section className={styles.sourceSection} id="source-story">
-        <div className={styles.sourceCopy}>
-          <span className={styles.eyebrow}>FIELD NOTES · 工作坊回访</span>
-          <h2>从致良田开始，<br />看见学习之后的变化。</h2>
-          <p>这组匿名反馈来自致良田工作坊回访。参与者不仅谈到生态农业与气候风险，也将观察延伸到乡村治理、在地文化、伙伴关系和未来行动。</p>
-          <dl>
-            <div><dt>地点</dt><dd>内蒙古阿拉善 · 致良田农场</dd></div>
-            <div><dt>观察关键词</dt><dd>气候风险 / 生态农业 / 韧性社区</dd></div>
-            <div><dt>公开原则</dt><dd>匿名摘录 / 尊重原意 / 支持持续对话</dd></div>
-          </dl>
-        </div>
-        <button className={styles.sourceImage} onClick={() => setLightboxOpen(true)} aria-label="全屏查看致良田参与者反馈原图">
-          <Image src="/impact/zhiliangtian-feedback.png" alt="致良田工作坊参与者匿名反馈摘录" width={1096} height={990} sizes="(max-width: 900px) 92vw, 48vw" />
-          <span>原始反馈节选 · 点击放大 ↗</span>
-        </button>
-      </section>
-
       <section className={styles.formSection} id="new-feedback">
         <div className={styles.formIntro}>
           <span className={styles.eyebrow}>ADD YOUR VOICE · 加入反馈</span>
@@ -554,14 +501,6 @@ export default function ImpactExperience() {
         <div className={styles.footerLinks}><Link href="/#places">探索地点</Link><Link href="/#learning">线上微课</Link><Link href="/#impact">行动成果</Link></div>
         <small>© 2026 一循地方 · Explore Places · Learn Together · Take Action</small>
       </footer>
-
-      {lightboxOpen && (
-        <div className={styles.lightbox} role="dialog" aria-modal="true" aria-label="致良田工作坊参与者反馈原图">
-          <button className={styles.closeLightbox} onClick={() => setLightboxOpen(false)} aria-label="关闭图片">×</button>
-          <div className={styles.lightboxImage}><Image src="/impact/zhiliangtian-feedback.png" alt="致良田工作坊参与者匿名反馈摘录" width={1096} height={990} sizes="96vw" priority /></div>
-          <span>按 ESC 关闭</span>
-        </div>
-      )}
 
       {notice && <div className={styles.notice} role="status">{notice}</div>}
     </main>

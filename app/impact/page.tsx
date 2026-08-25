@@ -9,7 +9,7 @@ export async function generateMetadata(): Promise<Metadata> {
   const origin = `${protocol}://${host}`;
   const title = "公开成果地图 · 一循地方";
   const description = "在一循地方公开成果地图中，按真实地点查看工作坊参与者的匿名反馈，并参与点赞、回复与新的在地讨论。";
-  const image = `${origin}/impact/zhiliangtian-feedback.png`;
+  const image = `${origin}/maps/yixun-project-map.png`;
 
   return {
     title,
@@ -19,7 +19,7 @@ export async function generateMetadata(): Promise<Metadata> {
       description,
       type: "website",
       locale: "zh_CN",
-      images: [{ url: image, width: 1096, height: 990, alt: "一循地方工作坊参与者反馈摘录" }],
+      images: [{ url: image, width: 1009, height: 706, alt: "一循地方公开成果地图" }],
     },
     twitter: {
       card: "summary_large_image",
