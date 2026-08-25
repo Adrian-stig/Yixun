@@ -967,90 +967,174 @@
   line-height: 1.8;
 }
 
-.teaVisual {
+.productMeter {
   position: relative;
-  width: 260px;
-  height: 270px;
-  margin: 24px auto 6px;
+  width: 270px;
+  height: 322px;
+  margin: 20px auto 4px;
 }
 
-.teaStem {
+.productCap {
   position: absolute;
-  bottom: 35px;
-  left: 128px;
-  width: 7px;
-  height: 174px;
-  border-radius: 999px;
-  background: rgba(255, 250, 240, 0.18);
-  transform: rotate(3deg);
+  z-index: 3;
+  top: 8px;
+  left: 50%;
+  width: 126px;
+  height: 24px;
+  border: 1px solid rgba(255, 250, 240, 0.28);
+  border-radius: 10px 10px 4px 4px;
+  background: rgba(255, 250, 240, 0.1);
+  box-shadow: inset 0 5px 10px rgba(255, 255, 255, 0.05);
+  transform: translateX(-50%);
 }
 
-.teaLeaf {
+.productVessel {
   position: absolute;
-  display: grid;
-  width: 82px;
-  height: 130px;
-  place-items: center;
-  border: 1px solid rgba(255, 250, 240, 0.22);
-  border-radius: 100% 0 100% 0;
-  background: rgba(255, 250, 240, 0.08);
-  color: rgba(255, 250, 240, 0.42);
-  transition: background 0.35s ease, color 0.35s ease, box-shadow 0.35s ease;
+  top: 29px;
+  left: 50%;
+  width: 190px;
+  height: 264px;
+  border: 1px solid rgba(255, 250, 240, 0.34);
+  border-radius: 34px 34px 62px 62px;
+  overflow: hidden;
+  background: linear-gradient(145deg, rgba(255, 250, 240, 0.12), rgba(255, 250, 240, 0.035));
+  box-shadow: inset 15px 0 28px rgba(255, 255, 255, 0.04), 0 24px 34px rgba(0, 0, 0, 0.16);
+  transform: translateX(-50%);
 }
 
-.teaLeaf::after {
+.productVessel::before {
   position: absolute;
-  width: 1px;
-  height: 78%;
-  background: currentColor;
+  z-index: 2;
+  inset: 8px;
+  border: 1px solid rgba(255, 250, 240, 0.08);
+  border-radius: 27px 27px 54px 54px;
   content: "";
-  opacity: 0.36;
-  transform: rotate(40deg);
+  pointer-events: none;
 }
 
-.teaLeaf i {
-  z-index: 1;
-  font-size: 8px;
+.productVessel::after {
+  position: absolute;
+  z-index: 2;
+  top: 20px;
+  bottom: 54px;
+  left: 20px;
+  width: 8px;
+  border-radius: 999px;
+  background: linear-gradient(180deg, rgba(255, 255, 255, 0.22), transparent);
+  content: "";
+  pointer-events: none;
+}
+
+.productFill {
+  position: absolute;
+  right: 0;
+  bottom: 0;
+  left: 0;
+  background:
+    radial-gradient(circle, rgba(255, 250, 240, 0.13) 0 2px, transparent 2.5px) 0 0 / 19px 19px,
+    linear-gradient(180deg, #a7bd72 0%, #7f9d5d 48%, #d0a94e 100%);
+  box-shadow: inset 0 14px 22px rgba(255, 255, 255, 0.08);
+  transition: height 0.55s cubic-bezier(0.2, 0.75, 0.25, 1);
+}
+
+.productFill::before {
+  position: absolute;
+  top: -10px;
+  right: -8px;
+  left: -8px;
+  height: 20px;
+  border-radius: 50%;
+  background: #b8ca82;
+  box-shadow: 0 3px 9px rgba(23, 60, 44, 0.22);
+  content: "";
+}
+
+.productSeal {
+  position: absolute;
+  z-index: 3;
+  top: 74px;
+  left: 50%;
+  display: flex;
+  width: 118px;
+  height: 118px;
+  align-items: center;
+  flex-direction: column;
+  justify-content: center;
+  border: 1px solid rgba(255, 250, 240, 0.56);
+  border-radius: 50%;
+  background: rgba(23, 60, 44, 0.22);
+  color: var(--cream);
+  text-align: center;
+  transform: translateX(-50%);
+}
+
+.productSeal small,
+.productSeal i {
+  font-size: 6px;
   font-style: normal;
-  font-weight: 700;
+  letter-spacing: 0.12em;
+  opacity: 0.7;
+}
+
+.productSeal strong {
+  margin: 7px 0;
+  font-family: var(--display), "STSong", serif;
+  font-size: 18px;
+  font-weight: 500;
   letter-spacing: 0.08em;
 }
 
-.leafOne {
-  top: 98px;
-  left: 40px;
-  transform: rotate(-48deg);
-}
-
-.leafOne i {
-  transform: rotate(48deg);
-}
-
-.leafTwo {
-  top: 78px;
-  right: 32px;
-  transform: rotate(36deg) scale(0.94);
-}
-
-.leafTwo i {
-  transform: rotate(-36deg);
-}
-
-.leafThree {
-  top: 8px;
-  left: 92px;
-  transform: rotate(-2deg) scale(0.86);
-}
-
-.leafThree i {
-  transform: rotate(2deg);
-}
-
-.teaLeaf.litLeaf {
-  border-color: #b7cb76;
-  background: #8fa95d;
-  box-shadow: 0 0 0 8px rgba(143, 169, 93, 0.1), 0 12px 28px rgba(0, 0, 0, 0.2);
+.productLevel {
+  position: absolute;
+  z-index: 4;
+  right: 8px;
+  min-width: 32px;
+  padding: 4px 6px;
+  border: 1px solid rgba(255, 250, 240, 0.28);
+  border-radius: 999px;
+  background: rgba(23, 60, 44, 0.78);
   color: var(--cream);
+  font-size: 7px;
+  font-weight: 700;
+  text-align: center;
+  transition: bottom 0.55s cubic-bezier(0.2, 0.75, 0.25, 1);
+}
+
+.productShadow {
+  position: absolute;
+  bottom: 4px;
+  left: 50%;
+  width: 172px;
+  height: 18px;
+  border-radius: 50%;
+  background: rgba(0, 0, 0, 0.2);
+  filter: blur(8px);
+  transform: translateX(-50%);
+}
+
+.xpLegend {
+  display: grid;
+  grid-template-columns: repeat(3, 1fr);
+  gap: 6px;
+  margin: 6px 0 22px;
+}
+
+.xpLegend span {
+  display: flex;
+  min-height: 46px;
+  align-items: center;
+  flex-direction: column;
+  justify-content: center;
+  border: 1px solid rgba(255, 250, 240, 0.12);
+  border-radius: 13px;
+  color: rgba(255, 250, 240, 0.56);
+  font-size: 7px;
+}
+
+.xpLegend strong {
+  margin-top: 4px;
+  color: var(--sun);
+  font-size: 11px;
 }
 
 .rewardProgress > div:first-child {
@@ -1762,7 +1846,7 @@
     min-height: auto;
   }
 
-  .teaVisual {
+  .productMeter {
     margin-top: 10px;
   }
 }
@@ -2168,7 +2252,8 @@
   .valueList button,
   .taskList button,
   .progressTrack span,
-  .teaLeaf,
+  .productFill,
+  .productLevel,
   .rewardTrack span {
     transition: none;
   }

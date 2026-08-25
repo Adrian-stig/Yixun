@@ -142,9 +142,13 @@ type StoredActionProgress = {
   courseCompleted?: boolean;
   completedTasks?: string[];
   actionRecords?: ActionRecord[];
+  checkInCount?: number;
 };
 
 const actionStorageKey = "yixun-huangshan-action-v1";
+const rewardGoalXp = 50;
+const courseXp = 5;
+const fieldActivityXp = 30;
 
 function todayLabel() {
   return new Intl.DateTimeFormat("zh-CN", { month: "2-digit", day: "2-digit" }).format(new Date());
@@ -162,6 +166,7 @@ export default function HuangshanExperience({ view }: HuangshanExperienceProps) 
   const [completedTasks, setCompletedTasks] = useState<string[]>([]);
   const [courseCompleted, setCourseCompleted] = useState(false);
   const [actionRecords, setActionRecords] = useState<ActionRecord[]>([]);
+  const [checkInCount, setCheckInCount] = useState(0);
   const [uploadPreview, setUploadPreview] = useState("");
   const [uploadName, setUploadName] = useState("");
   const [storageReady, setStorageReady] = useState(false);
@@ -174,8 +179,12 @@ export default function HuangshanExperience({ view }: HuangshanExperienceProps) 
   const currentValue = forestValues.find((item) => item.id === activeValue) ?? forestValues[0];
   const progress = Math.round((completedTasks.length / fieldTasks.length) * 100);
   const fieldPracticeCompleted = completedTasks.length === fieldTasks.length;
-  const rewardSegments = [courseCompleted, actionRecords.length > 0, fieldPracticeCompleted];
-  const rewardProgress = rewardSegments.filter(Boolean).length;
+  const earnedCourseXp = courseCompleted ? courseXp : 0;
+  const earnedFieldXp = fieldPracticeCompleted ? fieldActivityXp : 0;
+  const totalXp = earnedCourseXp + checkInCount + earnedFieldXp;
+  const rewardFill = Math.min(100, Math.round((totalXp / rewardGoalXp) * 100));
+  const rewardUnlocked = totalXp >= rewardGoalXp;
+  const remainingXp = Math.max(0, rewardGoalXp - totalXp);
 
   useEffect(() => {
     const timeout = window.setTimeout(() => {
@@ -185,7 +194,16 @@ export default function HuangshanExperience({ view }: HuangshanExperienceProps) 
           const parsed = JSON.parse(saved) as StoredActionProgress;
           if (typeof parsed.courseCompleted === "boolean") setCourseCompleted(parsed.courseCompleted);
           if (Array.isArray(parsed.completedTasks)) setCompletedTasks(parsed.completedTasks);
-          if (Array.isArray(parsed.actionRecords)) setActionRecords(parsed.actionRecords);
+          if (Array.isArray(parsed.actionRecords)) {
+            setActionRecords(parsed.actionRecords);
+            setCheckInCount(
+              typeof parsed.checkInCount === "number" && parsed.checkInCount >= 0
+                ? Math.floor(parsed.checkInCount)
+                : parsed.actionRecords.length,
+            );
+          } else if (typeof parsed.checkInCount === "number" && parsed.checkInCount >= 0) {
+            setCheckInCount(Math.floor(parsed.checkInCount));
+          }
         }
       } catch {
         // The default progress remains available when browser storage is unavailable.
@@ -199,11 +217,11 @@ export default function HuangshanExperience({ view }: HuangshanExperienceProps) 
   useEffect(() => {
     if (!storageReady) return;
     try {
-      window.localStorage.setItem(actionStorageKey, JSON.stringify({ courseCompleted, completedTasks, actionRecords }));
+      window.localStorage.setItem(actionStorageKey, JSON.stringify({ courseCompleted, completedTasks, actionRecords, checkInCount }));
     } catch {
       // The module continues in memory when browser storage is full or disabled.
     }
-  }, [actionRecords, completedTasks, courseCompleted, storageReady]);
+  }, [actionRecords, checkInCount, completedTasks, courseCompleted, storageReady]);
 
   useEffect(() => {
     if (!lightboxOpen) return;
@@ -231,9 +249,14 @@ export default function HuangshanExperience({ view }: HuangshanExperienceProps) 
   };
 
   const toggleTask = (task: string) => {
-    setCompletedTasks((current) =>
-      current.includes(task) ? current.filter((item) => item !== task) : [...current, task],
-    );
+    if (fieldPracticeCompleted) return;
+    const nextTasks = completedTasks.includes(task)
+      ? completedTasks.filter((item) => item !== task)
+      : [...completedTasks, task];
+    setCompletedTasks(nextTasks);
+    if (nextTasks.length === fieldTasks.length) {
+      setActionNotice(`在地活动完成，奖励进度 +${fieldActivityXp} XP`);
+    }
   };
 
   const handlePhoto = (event: React.ChangeEvent<HTMLInputElement>) => {
@@ -270,10 +293,11 @@ export default function HuangshanExperience({ view }: HuangshanExperienceProps) 
       date: todayLabel(),
     };
     setActionRecords((current) => [record, ...current].slice(0, 8));
+    setCheckInCount((current) => current + 1);
     setUploadPreview("");
     setUploadName("");
     event.currentTarget.reset();
-    setActionNotice("日常行动已记录，茶芽点亮一部分");
+    setActionNotice("打卡成功，黄山毛峰奖励进度 +1 XP");
   };
 
   return (
@@ -389,31 +413,31 @@ export default function HuangshanExperience({ view }: HuangshanExperienceProps) 
           <div className={styles.moduleMain}>
             <div className={styles.moduleTitle}>
               <div><span>MY LOCAL ACTION</span><h2>我的九龙峰行动路径</h2></div>
-              <p>完成微课、分享与在地实践，依次点亮一枚黄山毛峰茶芽。</p>
+              <p>完成微课、持续打卡与在地活动，让经验值从底部向上逐渐填满黄山毛峰奖励。</p>
             </div>
 
             <div className={styles.rewardSteps}>
               <article className={courseCompleted ? styles.completedStep : ""}>
-                <span>{courseCompleted ? "✓" : "01"}</span>
-                <div><small>LEARN · 学习</small><h3>完成一节森林水源微课</h3><p>8 分钟理解降雨、土壤、根系与水源涵养。</p></div>
-                <button onClick={() => { setCourseCompleted(true); setActionNotice("微课已完成，茶芽点亮一部分"); }} disabled={courseCompleted}>{courseCompleted ? "已点亮" : "完成微课"}</button>
+                <span>{courseCompleted ? "✓" : `+${courseXp}`}</span>
+                <div><small>LEARN · 一次 +{courseXp} XP</small><h3>完成一节森林水源微课</h3><p>8 分钟理解降雨、土壤、根系与水源涵养。</p></div>
+                <button onClick={() => { setCourseCompleted(true); setActionNotice(`微课完成，奖励进度 +${courseXp} XP`); }} disabled={courseCompleted}>{courseCompleted ? `已获得 ${courseXp} XP` : "完成微课"}</button>
               </article>
-              <article className={actionRecords.length > 0 ? styles.completedStep : ""}>
-                <span>{actionRecords.length > 0 ? "✓" : "02"}</span>
-                <div><small>SHARE · 分享</small><h3>上传一次日常可持续行动</h3><p>从节水、低干扰观察或负责任消费开始。</p></div>
-                <a href="#daily-action-form">{actionRecords.length > 0 ? "继续分享" : "去上传"} ↓</a>
+              <article className={checkInCount > 0 ? styles.completedStep : ""}>
+                <span>+1</span>
+                <div><small>CHECK IN · 每次 +1 XP</small><h3>坚持上传日常行动打卡</h3><p>每一条有效记录都累积经验，不限制为一次分享。</p></div>
+                <a href="#daily-action-form">{checkInCount > 0 ? `继续打卡 · 已 ${checkInCount} 次` : "开始打卡"} ↓</a>
               </article>
               <article className={fieldPracticeCompleted ? styles.completedStep : ""}>
-                <span>{fieldPracticeCompleted ? "✓" : "03"}</span>
-                <div><small>FIELD · 在地</small><h3>完成一次森林观察实践</h3><p>在真实环境中完成九龙峰观察卡的三项任务。</p></div>
-                <a href="#action">{fieldPracticeCompleted ? "再次查看" : "去实践"} ↓</a>
+                <span>{fieldPracticeCompleted ? "✓" : `+${fieldActivityXp}`}</span>
+                <div><small>FIELD · 一次 +{fieldActivityXp} XP</small><h3>参加一次九龙峰在地活动</h3><p>在真实地点完成观察卡，经验相当于 {fieldActivityXp} 次日常打卡。</p></div>
+                <a href="#action">{fieldPracticeCompleted ? `已获得 ${fieldActivityXp} XP` : "查看在地任务"} ↓</a>
               </article>
             </div>
 
             <form className={styles.actionForm} id="daily-action-form" onSubmit={submitDailyAction}>
               <div className={styles.formHeading}>
                 <div><span>UPLOAD YOUR ACTION</span><h3>上传我的日常行动</h3></div>
-                <small>首版记录仅保存在当前设备</small>
+                <small>累计 {checkInCount} 次打卡 · 首版记录仅保存在当前设备</small>
               </div>
               <div className={styles.actionFormGrid}>
                 <div>
@@ -442,13 +466,13 @@ export default function HuangshanExperience({ view }: HuangshanExperienceProps) 
               </div>
               <div className={styles.formSubmit}>
                 <span>请勿上传包含电话、住址等敏感信息的内容。图片仅用于当前会话预览。</span>
-                <button type="submit">记录并点亮茶芽 <b>↗</b></button>
+                <button type="submit">记录并获得 1 XP <b>↗</b></button>
               </div>
             </form>
 
             {actionRecords.length > 0 && (
               <div className={styles.myRecords}>
-                <div><span>我的行动记录</span><small>{actionRecords.length} 次分享</small></div>
+                <div><span>最近行动记录</span><small>累计 {checkInCount} 次打卡</small></div>
                 {actionRecords.slice(0, 3).map((record) => (
                   <article key={record.id}>
                     <span>{record.type}</span><p>{record.note}</p><small>{record.date}{record.photoName ? " · 已选择照片" : ""}</small>
@@ -460,21 +484,33 @@ export default function HuangshanExperience({ view }: HuangshanExperienceProps) 
 
           <aside className={styles.rewardCard}>
             <span className={styles.rewardEyebrow}>LOCAL REWARD · 地方奖励</span>
-            <h2>点亮一枚<br />黄山毛峰茶芽</h2>
-            <p>每完成一个阶段，茶芽的一部分就会亮起。全部点亮后，解锁目的地农业产物奖励。</p>
-            <div className={styles.teaVisual} role="img" aria-label={`黄山毛峰茶芽已点亮 ${rewardProgress} / 3 部分`}>
-              <span className={styles.teaStem} />
-              <span className={`${styles.teaLeaf} ${styles.leafOne} ${rewardSegments[0] ? styles.litLeaf : ""}`}><i>学习</i></span>
-              <span className={`${styles.teaLeaf} ${styles.leafTwo} ${rewardSegments[1] ? styles.litLeaf : ""}`}><i>分享</i></span>
-              <span className={`${styles.teaLeaf} ${styles.leafThree} ${rewardSegments[2] ? styles.litLeaf : ""}`}><i>实践</i></span>
+            <h2>逐步装满<br />黄山毛峰茶罐</h2>
+            <p>每一次行动都会累积经验，进度像水位一样从底部持续上升。达到 {rewardGoalXp} XP 后解锁目的地农产品奖励。</p>
+            <div className={styles.productMeter} role="img" aria-label={`黄山毛峰奖励已积累 ${totalXp} / ${rewardGoalXp} 经验值`}>
+              <span className={styles.productCap} />
+              <div className={styles.productVessel}>
+                <span className={styles.productFill} style={{ height: `${rewardFill}%` }} />
+                <span className={styles.productLevel} style={{ bottom: `max(6px, calc(${rewardFill}% - 8px))` }}>{rewardFill}%</span>
+                <div className={styles.productSeal}>
+                  <small>YIXUN PLACE</small>
+                  <strong>黄山毛峰</strong>
+                  <i>HUANGSHAN · GREEN TEA</i>
+                </div>
+              </div>
+              <span className={styles.productShadow} />
+            </div>
+            <div className={styles.xpLegend} aria-label="经验值规则">
+              <span>微课 <strong>+{courseXp}</strong></span>
+              <span>每次打卡 <strong>+1</strong></span>
+              <span>在地活动 <strong>+{fieldActivityXp}</strong></span>
             </div>
             <div className={styles.rewardProgress}>
-              <div><span>点亮进度</span><strong>{rewardProgress} / 3</strong></div>
-              <div className={styles.rewardTrack}><span style={{ width: `${rewardProgress * 33.333}%` }} /></div>
+              <div><span>累计经验</span><strong>{totalXp} / {rewardGoalXp} XP</strong></div>
+              <div className={styles.rewardTrack}><span style={{ width: `${rewardFill}%` }} /></div>
             </div>
-            <div className={rewardProgress === 3 ? styles.rewardUnlocked : styles.rewardLocked}>
-              <span>{rewardProgress === 3 ? "✓" : "⌁"}</span>
-              <div><strong>{rewardProgress === 3 ? "奖励已解锁" : "完成全部阶段后解锁"}</strong><small>黄山毛峰体验礼 · 奖励机制示意</small></div>
+            <div className={rewardUnlocked ? styles.rewardUnlocked : styles.rewardLocked}>
+              <span>{rewardUnlocked ? "✓" : "⌁"}</span>
+              <div><strong>{rewardUnlocked ? "黄山毛峰奖励已解锁" : `还需 ${remainingXp} XP 解锁`}</strong><small>{rewardUnlocked ? "可进入领取流程 · 奖励机制示意" : "坚持打卡，或参加一次在地活动快速累积"}</small></div>
             </div>
             <small className={styles.rewardNote}>正式礼品、库存与领取规则可在项目运营阶段配置。</small>
           </aside>
@@ -583,8 +619,8 @@ export default function HuangshanExperience({ view }: HuangshanExperienceProps) 
       <section className={styles.actionSection} id="action">
         <div className={styles.actionCopy}>
           <span className={styles.eyebrow}>TAKE ACTION</span>
-          <h2>完成一张<br />九龙峰观察卡</h2>
-          <p>依次完成三项轻量任务。全部完成后，将点亮奖励茶芽的“在地实践”部分；进度保存在当前设备。</p>
+          <h2>参加一次<br />九龙峰在地活动</h2>
+          <p>在真实地点依次完成三项观察任务。全部完成后一次获得 {fieldActivityXp} XP，大幅推进黄山毛峰奖励进度；记录保存在当前设备。</p>
           <div className={styles.progressLabel}><span>完成进度</span><strong>{progress}%</strong></div>
           <div className={styles.progressTrack}><span style={{ width: `${progress}%` }} /></div>
         </div>
