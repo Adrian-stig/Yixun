@@ -2,7 +2,7 @@
 
 import Image from "next/image";
 import Link from "next/link";
-import { useEffect, useMemo, useState } from "react";
+import { useEffect, useMemo, useRef, useState } from "react";
 import styles from "./huangshan.module.css";
 
 type ValueCategory = "生态价值" | "社会价值" | "经济价值";
@@ -113,6 +113,7 @@ const ecosystemChallenges = [
     title: "季节性水源压力",
     description: "山地降雨并不等于全年稳定供水。坡地径流与季节差异，会影响社区用水和森林水源涵养。",
     action: "缩短淋浴时间，记录一天减少的生活用水",
+    photoHint: "山地水源、溪沟或社区用水现场",
   },
   {
     number: "02",
@@ -120,6 +121,7 @@ const ecosystemChallenges = [
     title: "栖息地受到干扰",
     description: "游憩活动、道路与不恰当采集，都可能干扰物种栖息、迁徙和林下生态关系。",
     action: "完成一次不采集、低干扰的自然观察",
+    photoHint: "步道边缘、栖息地或低干扰观察现场",
   },
   {
     number: "03",
@@ -127,6 +129,7 @@ const ecosystemChallenges = [
     title: "保护与生计的平衡",
     description: "自然保护需要与社区生活形成长期合作，让地方产品、文化知识和生态价值共同延续。",
     action: "选择一件可追溯、少包装的地方产品",
+    photoHint: "地方农业、社区生活或农产品现场",
   },
 ];
 
@@ -160,6 +163,7 @@ type HuangshanExperienceProps = {
 
 export default function HuangshanExperience({ view }: HuangshanExperienceProps) {
   const isForest = view === "forest";
+  const challengeRailRef = useRef<HTMLDivElement>(null);
   const [activeCategory, setActiveCategory] = useState<(typeof categories)[number]>("全部价值");
   const [activeValue, setActiveValue] = useState(forestValues[0].id);
   const [lightboxOpen, setLightboxOpen] = useState(false);
@@ -257,6 +261,14 @@ export default function HuangshanExperience({ view }: HuangshanExperienceProps) 
     if (nextTasks.length === fieldTasks.length) {
       setActionNotice(`在地活动完成，奖励进度 +${fieldActivityXp} XP`);
     }
+  };
+
+  const scrollChallenges = (direction: -1 | 1) => {
+    const rail = challengeRailRef.current;
+    const firstCard = rail?.querySelector<HTMLElement>("article");
+    if (!rail || !firstCard) return;
+    const gap = Number.parseFloat(window.getComputedStyle(rail).columnGap || "0");
+    rail.scrollBy({ left: direction * (firstCard.offsetWidth + gap), behavior: "smooth" });
   };
 
   const handlePhoto = (event: React.ChangeEvent<HTMLInputElement>) => {
@@ -398,10 +410,22 @@ export default function HuangshanExperience({ view }: HuangshanExperienceProps) 
           <p>线下工作坊虽然已经结束，地方学习仍可以继续。选择一项与九龙峰相关的日常可持续行动，上传自己的记录，让个人改变与目的地生态议题建立可感知的联系。</p>
         </div>
 
-        <div className={styles.challengeGrid}>
+        <div className={styles.challengeRailHeader}>
+          <p><span>01—03</span> 左右滑动，依次查看目的地面临的生态困境</p>
+          <div>
+            <button type="button" onClick={() => scrollChallenges(-1)} aria-label="查看上一个生态困境">←</button>
+            <button type="button" onClick={() => scrollChallenges(1)} aria-label="查看下一个生态困境">→</button>
+          </div>
+        </div>
+        <div className={styles.challengeRail} ref={challengeRailRef} tabIndex={0} aria-label="九龙峰生态困境滑动卡片">
           {ecosystemChallenges.map((challenge) => (
             <article key={challenge.number}>
-              <div><span>{challenge.number}</span><i>{challenge.mark}</i></div>
+              <div className={styles.challengePhoto} aria-label={`${challenge.title}图片预留位置`}>
+                <span>＋</span>
+                <div><small>PHOTO PLACEHOLDER</small><strong>{challenge.photoHint}</strong></div>
+                <i>16:10</i>
+              </div>
+              <div className={styles.challengeTop}><span>{challenge.number}</span><i>{challenge.mark}</i></div>
               <h3>{challenge.title}</h3>
               <p>{challenge.description}</p>
               <a href="#daily-action-form">日常行动建议 <strong>{challenge.action}</strong><b>↓</b></a>
