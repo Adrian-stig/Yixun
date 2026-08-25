@@ -8,7 +8,7 @@ export async function generateMetadata(): Promise<Metadata> {
   const protocol = requestHeaders.get("x-forwarded-proto") ?? (host.startsWith("localhost") ? "http" : "https");
   const origin = `${protocol}://${host}`;
   const title = "黄山九龙峰 · 一循地方";
-  const description = "走进安徽黄山九龙峰自然保护区，通过可交互的森林价值图理解生态价值、社会价值与经济价值。";
+  const description = "走进安徽黄山九龙峰自然保护区，理解森林价值，参与目的地生态行动，并通过微课、分享与在地实践点亮地方奖励。";
   const image = `${origin}/places/huangshan-forest-values.png`;
 
   return {

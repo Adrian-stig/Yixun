@@ -106,11 +106,61 @@ const fieldTasks = [
   "写下一个关于保护与利用的问题",
 ];
 
+const ecosystemChallenges = [
+  {
+    number: "01",
+    mark: "水",
+    title: "季节性水源压力",
+    description: "山地降雨并不等于全年稳定供水。坡地径流与季节差异，会影响社区用水和森林水源涵养。",
+    action: "缩短淋浴时间，记录一天减少的生活用水",
+  },
+  {
+    number: "02",
+    mark: "生",
+    title: "栖息地受到干扰",
+    description: "游憩活动、道路与不恰当采集，都可能干扰物种栖息、迁徙和林下生态关系。",
+    action: "完成一次不采集、低干扰的自然观察",
+  },
+  {
+    number: "03",
+    mark: "村",
+    title: "保护与生计的平衡",
+    description: "自然保护需要与社区生活形成长期合作，让地方产品、文化知识和生态价值共同延续。",
+    action: "选择一件可追溯、少包装的地方产品",
+  },
+];
+
+type ActionRecord = {
+  id: string;
+  type: string;
+  note: string;
+  photoName: string;
+  date: string;
+};
+
+type StoredActionProgress = {
+  courseCompleted?: boolean;
+  completedTasks?: string[];
+  actionRecords?: ActionRecord[];
+};
+
+const actionStorageKey = "yixun-huangshan-action-v1";
+
+function todayLabel() {
+  return new Intl.DateTimeFormat("zh-CN", { month: "2-digit", day: "2-digit" }).format(new Date());
+}
+
 export default function HuangshanExperience() {
   const [activeCategory, setActiveCategory] = useState<(typeof categories)[number]>("全部价值");
   const [activeValue, setActiveValue] = useState(forestValues[0].id);
   const [lightboxOpen, setLightboxOpen] = useState(false);
   const [completedTasks, setCompletedTasks] = useState<string[]>([]);
+  const [courseCompleted, setCourseCompleted] = useState(false);
+  const [actionRecords, setActionRecords] = useState<ActionRecord[]>([]);
+  const [uploadPreview, setUploadPreview] = useState("");
+  const [uploadName, setUploadName] = useState("");
+  const [storageReady, setStorageReady] = useState(false);
+  const [actionNotice, setActionNotice] = useState("");
 
   const visibleValues = useMemo(
     () => forestValues.filter((item) => activeCategory === "全部价值" || item.category === activeCategory),
@@ -118,6 +168,37 @@ export default function HuangshanExperience() {
   );
   const currentValue = forestValues.find((item) => item.id === activeValue) ?? forestValues[0];
   const progress = Math.round((completedTasks.length / fieldTasks.length) * 100);
+  const fieldPracticeCompleted = completedTasks.length === fieldTasks.length;
+  const rewardSegments = [courseCompleted, actionRecords.length > 0, fieldPracticeCompleted];
+  const rewardProgress = rewardSegments.filter(Boolean).length;
+
+  useEffect(() => {
+    const timeout = window.setTimeout(() => {
+      try {
+        const saved = window.localStorage.getItem(actionStorageKey);
+        if (saved) {
+          const parsed = JSON.parse(saved) as StoredActionProgress;
+          if (typeof parsed.courseCompleted === "boolean") setCourseCompleted(parsed.courseCompleted);
+          if (Array.isArray(parsed.completedTasks)) setCompletedTasks(parsed.completedTasks);
+          if (Array.isArray(parsed.actionRecords)) setActionRecords(parsed.actionRecords);
+        }
+      } catch {
+        // The default progress remains available when browser storage is unavailable.
+      } finally {
+        setStorageReady(true);
+      }
+    }, 0);
+    return () => window.clearTimeout(timeout);
+  }, []);
+
+  useEffect(() => {
+    if (!storageReady) return;
+    try {
+      window.localStorage.setItem(actionStorageKey, JSON.stringify({ courseCompleted, completedTasks, actionRecords }));
+    } catch {
+      // The module continues in memory when browser storage is full or disabled.
+    }
+  }, [actionRecords, completedTasks, courseCompleted, storageReady]);
 
   useEffect(() => {
     if (!lightboxOpen) return;
@@ -132,6 +213,12 @@ export default function HuangshanExperience() {
     };
   }, [lightboxOpen]);
 
+  useEffect(() => {
+    if (!actionNotice) return;
+    const timeout = window.setTimeout(() => setActionNotice(""), 2600);
+    return () => window.clearTimeout(timeout);
+  }, [actionNotice]);
+
   const chooseCategory = (category: (typeof categories)[number]) => {
     setActiveCategory(category);
     const firstMatch = forestValues.find((item) => category === "全部价值" || item.category === category);
@@ -144,6 +231,46 @@ export default function HuangshanExperience() {
     );
   };
 
+  const handlePhoto = (event: React.ChangeEvent<HTMLInputElement>) => {
+    const file = event.target.files?.[0];
+    if (!file) {
+      setUploadPreview("");
+      setUploadName("");
+      return;
+    }
+    if (file.size > 5 * 1024 * 1024) {
+      event.target.value = "";
+      setActionNotice("请选择小于 5MB 的图片");
+      return;
+    }
+    const reader = new FileReader();
+    reader.onload = () => {
+      setUploadPreview(typeof reader.result === "string" ? reader.result : "");
+      setUploadName(file.name);
+    };
+    reader.readAsDataURL(file);
+  };
+
+  const submitDailyAction = (event: React.FormEvent<HTMLFormElement>) => {
+    event.preventDefault();
+    const form = new FormData(event.currentTarget);
+    const type = String(form.get("actionType") ?? "节水生活");
+    const note = String(form.get("actionNote") ?? "").trim();
+    if (!note) return;
+    const record: ActionRecord = {
+      id: `action-${Date.now()}`,
+      type,
+      note,
+      photoName: uploadName,
+      date: todayLabel(),
+    };
+    setActionRecords((current) => [record, ...current].slice(0, 8));
+    setUploadPreview("");
+    setUploadName("");
+    event.currentTarget.reset();
+    setActionNotice("日常行动已记录，茶芽点亮一部分");
+  };
+
   return (
     <main className={styles.page}>
       <header className={styles.header}>
@@ -152,8 +279,8 @@ export default function HuangshanExperience() {
         </Link>
         <nav aria-label="黄山专题页导航">
           <a href="#about">认识九龙峰</a>
+          <a href="#workshop-action">行动共创</a>
           <a href="#forest-values">森林价值</a>
-          <a href="#field-path">观察路径</a>
           <a href="#action">行动任务</a>
         </nav>
         <Link className={styles.backLink} href="/#places">返回地点地图 <span>↗</span></Link>
@@ -165,7 +292,7 @@ export default function HuangshanExperience() {
           <h1>读懂一片森林的<br /><em>多重价值</em></h1>
           <p>以九龙峰自然保护区为例，从一棵树出发，看见森林如何连接气候、水土、生物、社区与人的生活。</p>
           <div className={styles.heroActions}>
-            <a className={styles.primaryAction} href="#forest-values">开始探索 <span>↓</span></a>
+            <a className={styles.primaryAction} href="#workshop-action">探索工作坊 <span>↓</span></a>
             <button className={styles.secondaryAction} onClick={() => setLightboxOpen(true)}>查看森林价值图 <span>↗</span></button>
           </div>
           <div className={styles.heroMeta}>
@@ -197,6 +324,123 @@ export default function HuangshanExperience() {
           <div><span>场景</span><strong>自然保护区</strong></div>
           <div><span>核心议题</span><strong>生物多样性</strong></div>
         </aside>
+      </section>
+
+      <section className={styles.workshopSection} id="workshop-action">
+        <div className={styles.workshopHeading}>
+          <div>
+            <span className={styles.workshopStatus}>工作坊已完成 · 持续行动开放中</span>
+            <span className={styles.eyebrow}>POST-WORKSHOP ACTION · 工作坊之后</span>
+            <h2>把九龙峰的生态困境，<br />带回每天的生活。</h2>
+          </div>
+          <p>线下工作坊虽然已经结束，地方学习仍可以继续。选择一项与九龙峰相关的日常可持续行动，上传自己的记录，让个人改变与目的地生态议题建立可感知的联系。</p>
+        </div>
+
+        <div className={styles.challengeGrid}>
+          {ecosystemChallenges.map((challenge) => (
+            <article key={challenge.number}>
+              <div><span>{challenge.number}</span><i>{challenge.mark}</i></div>
+              <h3>{challenge.title}</h3>
+              <p>{challenge.description}</p>
+              <a href="#daily-action-form">日常行动建议 <strong>{challenge.action}</strong><b>↓</b></a>
+            </article>
+          ))}
+        </div>
+
+        <div className={styles.userModule}>
+          <div className={styles.moduleMain}>
+            <div className={styles.moduleTitle}>
+              <div><span>MY LOCAL ACTION</span><h2>我的九龙峰行动路径</h2></div>
+              <p>完成微课、分享与在地实践，依次点亮一枚黄山毛峰茶芽。</p>
+            </div>
+
+            <div className={styles.rewardSteps}>
+              <article className={courseCompleted ? styles.completedStep : ""}>
+                <span>{courseCompleted ? "✓" : "01"}</span>
+                <div><small>LEARN · 学习</small><h3>完成一节森林水源微课</h3><p>8 分钟理解降雨、土壤、根系与水源涵养。</p></div>
+                <button onClick={() => { setCourseCompleted(true); setActionNotice("微课已完成，茶芽点亮一部分"); }} disabled={courseCompleted}>{courseCompleted ? "已点亮" : "完成微课"}</button>
+              </article>
+              <article className={actionRecords.length > 0 ? styles.completedStep : ""}>
+                <span>{actionRecords.length > 0 ? "✓" : "02"}</span>
+                <div><small>SHARE · 分享</small><h3>上传一次日常可持续行动</h3><p>从节水、低干扰观察或负责任消费开始。</p></div>
+                <a href="#daily-action-form">{actionRecords.length > 0 ? "继续分享" : "去上传"} ↓</a>
+              </article>
+              <article className={fieldPracticeCompleted ? styles.completedStep : ""}>
+                <span>{fieldPracticeCompleted ? "✓" : "03"}</span>
+                <div><small>FIELD · 在地</small><h3>完成一次森林观察实践</h3><p>在真实环境中完成九龙峰观察卡的三项任务。</p></div>
+                <a href="#action">{fieldPracticeCompleted ? "再次查看" : "去实践"} ↓</a>
+              </article>
+            </div>
+
+            <form className={styles.actionForm} id="daily-action-form" onSubmit={submitDailyAction}>
+              <div className={styles.formHeading}>
+                <div><span>UPLOAD YOUR ACTION</span><h3>上传我的日常行动</h3></div>
+                <small>首版记录仅保存在当前设备</small>
+              </div>
+              <div className={styles.actionFormGrid}>
+                <div>
+                  <label htmlFor="actionType">行动类型</label>
+                  <select id="actionType" name="actionType" defaultValue="节水生活">
+                    <option>节水生活</option>
+                    <option>低干扰自然观察</option>
+                    <option>负责任地方消费</option>
+                    <option>减少一次性用品</option>
+                  </select>
+                  <label htmlFor="actionNote">行动记录</label>
+                  <textarea id="actionNote" name="actionNote" minLength={8} maxLength={360} placeholder="我今天做了什么？它与九龙峰的哪一个生态困境有关？" required />
+                </div>
+                <div className={styles.uploadColumn}>
+                  <label htmlFor="actionPhoto">行动照片（可选）</label>
+                  <label className={styles.uploadBox} htmlFor="actionPhoto">
+                    {uploadPreview ? (
+                      <Image src={uploadPreview} alt="待上传的行动照片预览" fill sizes="(max-width: 760px) 90vw, 28vw" unoptimized />
+                    ) : (
+                      <span><b>＋</b><strong>选择一张行动照片</strong><small>JPG / PNG · 不超过 5MB</small></span>
+                    )}
+                  </label>
+                  <input className={styles.fileInput} id="actionPhoto" name="actionPhoto" type="file" accept="image/jpeg,image/png,image/webp" onChange={handlePhoto} />
+                  {uploadName && <small className={styles.fileName}>已选择：{uploadName}</small>}
+                </div>
+              </div>
+              <div className={styles.formSubmit}>
+                <span>请勿上传包含电话、住址等敏感信息的内容。图片仅用于当前会话预览。</span>
+                <button type="submit">记录并点亮茶芽 <b>↗</b></button>
+              </div>
+            </form>
+
+            {actionRecords.length > 0 && (
+              <div className={styles.myRecords}>
+                <div><span>我的行动记录</span><small>{actionRecords.length} 次分享</small></div>
+                {actionRecords.slice(0, 3).map((record) => (
+                  <article key={record.id}>
+                    <span>{record.type}</span><p>{record.note}</p><small>{record.date}{record.photoName ? " · 已选择照片" : ""}</small>
+                  </article>
+                ))}
+              </div>
+            )}
+          </div>
+
+          <aside className={styles.rewardCard}>
+            <span className={styles.rewardEyebrow}>LOCAL REWARD · 地方奖励</span>
+            <h2>点亮一枚<br />黄山毛峰茶芽</h2>
+            <p>每完成一个阶段，茶芽的一部分就会亮起。全部点亮后，解锁目的地农业产物奖励。</p>
+            <div className={styles.teaVisual} role="img" aria-label={`黄山毛峰茶芽已点亮 ${rewardProgress} / 3 部分`}>
+              <span className={styles.teaStem} />
+              <span className={`${styles.teaLeaf} ${styles.leafOne} ${rewardSegments[0] ? styles.litLeaf : ""}`}><i>学习</i></span>
+              <span className={`${styles.teaLeaf} ${styles.leafTwo} ${rewardSegments[1] ? styles.litLeaf : ""}`}><i>分享</i></span>
+              <span className={`${styles.teaLeaf} ${styles.leafThree} ${rewardSegments[2] ? styles.litLeaf : ""}`}><i>实践</i></span>
+            </div>
+            <div className={styles.rewardProgress}>
+              <div><span>点亮进度</span><strong>{rewardProgress} / 3</strong></div>
+              <div className={styles.rewardTrack}><span style={{ width: `${rewardProgress * 33.333}%` }} /></div>
+            </div>
+            <div className={rewardProgress === 3 ? styles.rewardUnlocked : styles.rewardLocked}>
+              <span>{rewardProgress === 3 ? "✓" : "⌁"}</span>
+              <div><strong>{rewardProgress === 3 ? "奖励已解锁" : "完成全部阶段后解锁"}</strong><small>黄山毛峰体验礼 · 奖励机制示意</small></div>
+            </div>
+            <small className={styles.rewardNote}>正式礼品、库存与领取规则可在项目运营阶段配置。</small>
+          </aside>
+        </div>
       </section>
 
       <section className={styles.visualSection}>
@@ -296,7 +540,7 @@ export default function HuangshanExperience() {
         <div className={styles.actionCopy}>
           <span className={styles.eyebrow}>TAKE ACTION</span>
           <h2>完成一张<br />九龙峰观察卡</h2>
-          <p>依次完成三项轻量任务。你的选择只保存在当前页面，用于体验完整的观察流程。</p>
+          <p>依次完成三项轻量任务。全部完成后，将点亮奖励茶芽的“在地实践”部分；进度保存在当前设备。</p>
           <div className={styles.progressLabel}><span>完成进度</span><strong>{progress}%</strong></div>
           <div className={styles.progressTrack}><span style={{ width: `${progress}%` }} /></div>
         </div>
@@ -344,6 +588,8 @@ export default function HuangshanExperience() {
           <p>拖动或横向滑动查看完整图片 · 按 ESC 关闭</p>
         </div>
       )}
+
+      {actionNotice && <div className={styles.actionNotice} role="status">{actionNotice}</div>}
     </main>
   );
 }

@@ -566,17 +566,20 @@ export default function Home() {
               <h3>{currentPlace.title}</h3>
               <p>{currentPlace.description}</p>
               <PhotoSlot label={`${currentPlace.title}现场照片`} note="建议使用地点全景或观察活动照片 · 3:2" className="place-photo-slot" />
-              <div className="detail-meta">
-                <div><small>工作坊安排</small><strong>{currentPlace.date}</strong></div>
-                <div><small>参与名额</small><strong>{currentPlace.seats ? `${currentPlace.seats} 人` : "待公布"}</strong></div>
-              </div>
-              <button className="primary-button full" onClick={() => setSignupOpen(true)}>
-                关注工作坊 <span>↗</span>
-              </button>
-              {currentPlace.id === 3 && (
-                <Link className="place-deep-link" href="/places/huangshan">
-                  进入黄山专题页 <span>→</span>
+              {currentPlace.id !== 3 && (
+                <div className="detail-meta">
+                  <div><small>工作坊安排</small><strong>{currentPlace.date}</strong></div>
+                  <div><small>参与名额</small><strong>{currentPlace.seats ? `${currentPlace.seats} 人` : "待公布"}</strong></div>
+                </div>
+              )}
+              {currentPlace.id === 3 ? (
+                <Link className="primary-button full" href="/places/huangshan#workshop-action">
+                  探索工作坊 <span>↗</span>
                 </Link>
+              ) : (
+                <button className="primary-button full" onClick={() => setSignupOpen(true)}>
+                  关注工作坊 <span>↗</span>
+                </button>
               )}
             </article>
           </div>
@@ -586,13 +589,17 @@ export default function Home() {
               <button
                 key={place.id}
                 onClick={() => {
+                  if (place.id === 3) {
+                    window.location.href = "/places/huangshan#workshop-action";
+                    return;
+                  }
                   setActivePlace(place.id);
                   setSignupOpen(true);
                 }}
               >
                 <span className="list-index">0{place.id}</span>
                 <span><small>{place.topic} · {place.district}</small><strong>{place.title}</strong></span>
-                <span>{place.date}</span><i>↗</i>
+                <span>{place.id === 3 ? "工作坊已完成" : place.date}</span><i>↗</i>
               </button>
             ))}
           </div>
