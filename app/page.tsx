@@ -588,6 +588,13 @@ export default function Home() {
                     </span>
                     <b aria-hidden="true">↗</b>
                   </Link>
+                  <Link className="place-route-button innovation" href="/places/huangshan/innovation">
+                    <span>
+                      <small>企业伙伴 · 长期在地共创</small>
+                      <strong>可持续创新项目</strong>
+                    </span>
+                    <b aria-hidden="true">↗</b>
+                  </Link>
                 </div>
               ) : (
                 <button className="primary-button full" onClick={() => setSignupOpen(true)}>

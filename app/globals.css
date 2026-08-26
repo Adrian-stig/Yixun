@@ -2977,6 +2977,12 @@ footer {
   color: var(--forest);
 }
 
+.place-route-button.innovation {
+  border-color: #bd6847;
+  background: #bd6847;
+  color: white;
+}
+
 .place-route-button:hover,
 .place-route-button:focus-visible {
   transform: translateY(-2px);
@@ -2990,6 +2996,12 @@ footer {
 .place-route-button.workshop:hover,
 .place-route-button.workshop:focus-visible {
   background: #eee5cf;
+}
+
+.place-route-button.innovation:hover,
+.place-route-button.innovation:focus-visible {
+  border-color: #9d5137;
+  background: #9d5137;
 }
 
 @media (max-width: 760px) {
